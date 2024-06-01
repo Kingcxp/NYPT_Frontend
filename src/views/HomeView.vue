@@ -1,5 +1,12 @@
+<script setup>
+import NavBar from "@/components/NavBar.vue"
+</script>
+
 <template>
-  <main>
-    <p>Hello, world!</p>
-  </main>
+  <el-container class="home-container">
+    <NavBar />
+    <el-main>
+      <p>Hello, world!</p>
+    </el-main>
+  </el-container>
 </template>
