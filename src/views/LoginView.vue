@@ -5,6 +5,7 @@ import { sha256 } from 'js-sha256'
 import { ElMessage } from 'element-plus'
 
 import NavBar from '@/components/NavBar.vue'
+import FootBar from '@/components/FootBar.vue'
 
 
 const base = new Base64()
@@ -62,6 +63,9 @@ const onLogin = async () => {
       <el-container class="login-form-container">
         <el-form class="login-form" ref="formRef" :model="form" :rules="rules" label-position="left" label-width="80px">
           <el-container style="width: 100%; margin-bottom: 4vh;">
+            <img src="../components/icons/phy-title.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%)"/>
+          </el-container>
+          <el-container style="width: 100%; margin-bottom: 4vh;">
             <el-text class="login-form-title">登录</el-text>
           </el-container>
           <el-form-item class="login-form-item" label="用户名" prop="name" @keyup.enter="onLogin(formRef)">
@@ -74,12 +78,13 @@ const onLogin = async () => {
           <el-container style="width: 100%; margin-top: 2vh;">
             <label style="margin: auto;">
               没有账号？
-              <a href="/register" style="text-decoration: none; color: #409eff;">注册</a>
+              <a href="/register" style="text-decoration: none; color: #409eff; text-shadow: 0 0 12px #409eff">注册</a>
             </label>
           </el-container>
         </el-form>
       </el-container>
     </el-main>
+    <FootBar />
   </el-container>
 </template>
 
@@ -90,7 +95,7 @@ const onLogin = async () => {
 }
 .login-main {
   display: flex;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 140px);
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -103,6 +108,7 @@ const onLogin = async () => {
   box-shadow: 2px 2px 12px #409eff;
   margin: 0;
   flex: none;
+  background-color: #181818;
 }
 .login-form {
   width: 100%;

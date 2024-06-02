@@ -16,13 +16,13 @@ const tryFetch = async () => {
   await proxy.$http.get(`/auth/id`).then((response) => {
     userID.value = response.data.user_id
     emit('userID', response.data.user_id)
-  }).catch((_error) => {
+  }).catch(() => {
     userID.value = undefined;
   })
   if (userID.value !== undefined) {
     await proxy.$http.post(`/auth/userdata/user_name`).then((response) => {
       userName.value = response.data.name;
-    }).catch((_error) => {
+    }).catch(() => {
       userName.value = '';
     })
   }
@@ -35,8 +35,8 @@ onMounted(async () => {
 
 <template>
   <el-header class="navbar">
-    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(2px 2px 12px #6f106e);" />
-    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(2px 2px 8px #409eff); margin-left: 12px;"/>
+    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(1px 1px 8px #FF25FD);" />
+    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(1px 1px 6px #409eff); margin-left: 12px;"/>
     <el-button @click="jump('/login')" class="navbar-btn" v-if="!userID">
       登录
     </el-button>
@@ -51,6 +51,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   border-bottom: 1px solid #666666;
+  background-color: #181818;
 }
 .navbar-btn {
   background-color: rgba(255, 255, 255, 0.3);
@@ -64,6 +65,7 @@ onMounted(async () => {
   padding: 0;
   margin-left: calc(100vw - 300px);
   font-size: medium;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.3);
 }
 .navbar-btn:hover {
   cursor: pointer;

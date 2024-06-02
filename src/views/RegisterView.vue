@@ -5,6 +5,7 @@ import { sha256 } from 'js-sha256'
 import { ElMessage } from 'element-plus'
 
 import NavBar from '@/components/NavBar.vue'
+import FootBar from '@/components/FootBar.vue'
 
 
 const base = new Base64()
@@ -80,6 +81,7 @@ const onRegister = async () => {
         </el-form>
       </el-container>
     </el-main>
+    <FootBar />
   </el-container>
 </template>
 
@@ -90,7 +92,7 @@ const onRegister = async () => {
 }
 .register-main {
   display: flex;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 140px);
   justify-content: center;
   align-items: center;
   flex-direction: column;
