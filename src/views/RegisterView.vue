@@ -20,11 +20,11 @@ const rules = {
   passwd: [{required: true, message: '未输入密码！', trigger: 'blur'}]
 }
 
-const onLogin = async () => {
+const onRegister = async () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
       let salt = Math.random().toString(36).slice(-4)
-      await proxy.$http.post(`/auth/login`, {
+      await proxy.$http.post(`/auth/register`, {
         "name": form.name.toString(),
         "token": sha256(String(base.encode(form.passwd.toString())) + salt),
         "salt": salt
@@ -56,25 +56,25 @@ const onLogin = async () => {
 </script>
 
 <template>
-  <el-container class="login-container">
+    <el-container class="register-container">
     <NavBar />
-    <el-main class="login-main">
-      <el-container class="login-form-container">
-        <el-form class="login-form" ref="formRef" :model="form" :rules="rules" label-position="left" label-width="80px">
+    <el-main class="register-main">
+      <el-container class="register-form-container">
+        <el-form class="register-form" ref="formRef" :model="form" :rules="rules" label-position="left" label-width="80px">
           <el-container style="width: 100%; margin-bottom: 4vh;">
-            <el-text class="login-form-title">登录</el-text>
+            <el-text class="register-form-title">注册</el-text>
           </el-container>
-          <el-form-item class="login-form-item" label="用户名" prop="name" @keyup.enter="onLogin(formRef)">
+          <el-form-item class="register-form-item" label="用户名" prop="name" @keyup.enter="onRegister(formRef)">
             <el-input v-model="form.name" placeholder="请输入用户名"/>
           </el-form-item>
-          <el-form-item class="login-form-item" label="密码" prop="passwd">
-            <el-input v-model="form.passwd" placeholder="请输入密码" type="password" @keyup.enter="onLogin(formRef)"/>
+          <el-form-item class="register-form-item" label="密码" prop="passwd">
+            <el-input v-model="form.passwd" placeholder="请输入密码" type="password" @keyup.enter="onRegister(formRef)"/>
           </el-form-item>
-          <el-button type="primary" style="width: 100%" @click="onLogin(formRef)">登录</el-button>
+          <el-button type="primary" style="width: 100%" @click="onRegister(formRef)">注册</el-button>
           <el-container style="width: 100%; margin-top: 2vh;">
             <label style="margin: auto;">
-              没有账号？
-              <a href="/register" style="text-decoration: none; color: #409eff;">注册</a>
+              已有账号？
+              <a href="/login" style="text-decoration: none; color: #409eff;">登录</a>
             </label>
           </el-container>
         </el-form>
@@ -84,18 +84,18 @@ const onLogin = async () => {
 </template>
 
 <style scoped>
-.login-container {
+.register-container {
   display: flex;
   flex-direction: column;
 }
-.login-main {
+.register-main {
   display: flex;
   height: calc(100vh - 60px);
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
-.login-form-container {
+.register-form-container {
   width: 32vw;
   height: 75vh;
   border: 1px solid #409eff;
@@ -104,16 +104,16 @@ const onLogin = async () => {
   margin: 0;
   flex: none;
 }
-.login-form {
+.register-form {
   width: 100%;
   margin: auto 6vw;
 }
-.login-form-title {
+.register-form-title {
   font-size: xx-large;
   color: white;
   margin: auto;
 }
-.login-form-item {
+.register-form-item {
   margin-bottom: 4vh !important;
 }
 </style>

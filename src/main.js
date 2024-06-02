@@ -1,4 +1,5 @@
 import './assets/main.css'
+import 'element-plus/dist/index.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -9,7 +10,7 @@ import axios from "@/utils/axiosInstance"
 
 const app = createApp(App)
 
-app.use(ElementPlus, { size: "small", zIndex: 3000 });
+app.use(ElementPlus, { size: "large", zIndex: 3000 });
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }

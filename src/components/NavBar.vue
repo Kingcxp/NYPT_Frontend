@@ -1,5 +1,6 @@
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
+
 
 const { proxy } = getCurrentInstance()
 const emit = defineEmits(['userID'])
@@ -15,35 +16,39 @@ const tryFetch = async () => {
   await proxy.$http.get(`/auth/id`).then((response) => {
     userID.value = response.data.user_id
     emit('userID', response.data.user_id)
-  }).catch((error) => {
+  }).catch((_error) => {
     userID.value = undefined;
   })
   if (userID.value !== undefined) {
     await proxy.$http.post(`/auth/userdata/user_name`).then((response) => {
       userName.value = response.data.name;
-    }).catch((error) => {
+    }).catch((_error) => {
       userName.value = '';
     })
   }
 }
+
+onMounted(async () => {
+  await tryFetch()
+})
 </script>
 
 <template>
   <el-header class="navbar">
-    <img src="./icons/nju-logo.png" width="37px" height="37px"/>
-    <img src="./icons/name-bold.png" height="30px" width="auto"/>
+    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(2px 2px 12px #6f106e);" />
+    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(2px 2px 8px #409eff); margin-left: 12px;"/>
     <el-button @click="jump('/login')" class="navbar-btn" v-if="!userID">
       登录
     </el-button>
   </el-header>
 </template>
 
-<style>
+<style scoped>
 .navbar {
   height: 60px;
-  padding: 0 12px 0 32px;
+  padding: 0 32px;
   width: 100vw;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   border-bottom: 1px solid #666666;
 }
@@ -55,9 +60,10 @@ const tryFetch = async () => {
   align-items: center;
   border-radius: 5px;
   height: 36px;
-  width: 78px;
+  width: 85px;
   padding: 0;
-  margin-left: calc(100vw - 261px);
+  margin-left: calc(100vw - 300px);
+  font-size: medium;
 }
 .navbar-btn:hover {
   cursor: pointer;
