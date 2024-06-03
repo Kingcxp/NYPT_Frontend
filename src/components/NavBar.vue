@@ -35,8 +35,8 @@ onMounted(async () => {
 
 <template>
   <el-header class="navbar">
-    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(1px 1px 8px #FF25FD);" />
-    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(1px 1px 6px #409eff); margin-left: 12px;"/>
+    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(0 0 6px #FF25FD);" />
+    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(0 0 2px #409eff); margin-left: 8px;"/>
     <el-button @click="jump('/login')" class="navbar-btn" v-if="!userID">
       登录
     </el-button>

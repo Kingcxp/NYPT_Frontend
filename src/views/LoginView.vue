@@ -62,10 +62,10 @@ const onLogin = async () => {
     <el-main class="login-main">
       <el-container class="login-form-container">
         <el-form class="login-form" ref="formRef" :model="form" :rules="rules" label-position="left" label-width="80px">
-          <el-container style="width: 100%; margin-bottom: 4vh;">
-            <img src="../components/icons/phy-title.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%)"/>
+          <el-container class="login-form-div">
+            <img src="../components/icons/phy-title.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%);"/>
           </el-container>
-          <el-container style="width: 100%; margin-bottom: 4vh;">
+          <el-container class="login-form-div">
             <el-text class="login-form-title">登录</el-text>
           </el-container>
           <el-form-item class="login-form-item" label="用户名" prop="name" @keyup.enter="onLogin(formRef)">
@@ -74,7 +74,7 @@ const onLogin = async () => {
           <el-form-item class="login-form-item" label="密码" prop="passwd">
             <el-input v-model="form.passwd" placeholder="请输入密码" type="password" @keyup.enter="onLogin(formRef)"/>
           </el-form-item>
-          <el-button type="primary" style="width: 100%" @click="onLogin(formRef)">登录</el-button>
+          <el-button type="primary" style="width: 100%; margin-top: 1.5vh;" @click="onLogin(formRef)">登录</el-button>
           <el-container style="width: 100%; margin-top: 2vh;">
             <label style="margin: auto;">
               没有账号？
@@ -101,11 +101,11 @@ const onLogin = async () => {
   flex-direction: column;
 }
 .login-form-container {
-  width: 32vw;
+  width: 36vw;
   height: 75vh;
-  border: 1px solid #409eff;
+  border: 1px solid white;
   border-radius: 8px;
-  box-shadow: 2px 2px 12px #409eff;
+  box-shadow: 2px 2px 12px white;
   margin: 0;
   flex: none;
   background-color: #181818;
@@ -118,6 +118,11 @@ const onLogin = async () => {
   font-size: xx-large;
   color: white;
   margin: auto;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+.login-form-div {
+  width: 100%;
+  margin-bottom: 4vh;
 }
 .login-form-item {
   margin-bottom: 4vh !important;
@@ -128,5 +133,12 @@ const onLogin = async () => {
 .el-form-item__label {
   font-size: larger;
   color: white;
+}
+.el-input {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+.el-radio-button {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  margin-right: 2px;
 }
 </style>
