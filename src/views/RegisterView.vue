@@ -256,6 +256,7 @@ watch(form, async (value, oldValue) => {
   box-shadow: 2px 2px 12px white;
   margin: 0;
   flex: none;
+  background-color: rgba(24, 24, 24, 0.92);
 }
 .register-form {
   width: 100%;
@@ -269,10 +270,10 @@ watch(form, async (value, oldValue) => {
 }
 .register-form-div {
   width: 100%;
-  margin-bottom: 2vh;
+  margin-bottom: 1.2vh;
 }
 .register-form-item {
-  margin-bottom: 2vh !important;
+  margin-bottom: 1.2vh !important;
 }
 </style>
 

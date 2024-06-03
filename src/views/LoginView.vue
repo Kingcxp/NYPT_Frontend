@@ -108,7 +108,7 @@ const onLogin = async () => {
   box-shadow: 2px 2px 12px white;
   margin: 0;
   flex: none;
-  background-color: #181818;
+  background-color: rgba(24, 24, 24, 0.92);
 }
 .login-form {
   width: 100%;
