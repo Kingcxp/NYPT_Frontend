@@ -35,11 +35,24 @@ onMounted(async () => {
 
 <template>
   <el-header class="navbar">
-    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(1px 1px 8px #FF25FD);" />
-    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(1px 1px 6px #409eff); margin-left: 12px;"/>
+    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(0 0 6px #FF25FD);" />
+    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(0 0 2px #409eff); margin-left: 8px;"/>
     <el-button @click="jump('/login')" class="navbar-btn" v-if="!userID">
       登录
     </el-button>
+    <el-dropdown trigger="click" v-else>
+      <el-button class="navbar-btn" round>
+        菜单
+      </el-button>
+      <template #dropdown>
+        <!-- 此处跳转链接，暂未设计 -->
+        <el-dropdown-item>Line1</el-dropdown-item>
+        <el-dropdown-item>Line2</el-dropdown-item>
+        <el-dropdown-item>Line3</el-dropdown-item>
+        <el-dropdown-item disabled>Line4</el-dropdown-item>
+        <el-dropdown-item divided>Line5</el-dropdown-item>
+      </template>
+    </el-dropdown>
   </el-header>
 </template>
 

@@ -4,7 +4,7 @@
       <img src="./icons/footer-logo.png" class="footer-img" style="filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))" />
     </a>
     <a href="https://physics.nju.edu.cn/">
-      <img src="./icons/phy-title.png" class="footer-img" style="filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)) brightness(1000%)" />
+      <img src="./icons/phy-title.png" class="footer-img" style="filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)) grayscale(100%) brightness(100)" />
     </a>
     <label class="footer-text">COPYRIGHT © NANJING UNIVERSITY ALL RIGHTS RESERVED</label>
   </el-footer>
