@@ -26,10 +26,10 @@ const onLogin = async () => {
     if (valid) {
       let salt = Math.random().toString(36).slice(-4)
       await proxy.$http.post(`/auth/login`, {
-        "name": form.name.toString(),
-        "token": sha256(String(base.encode(form.passwd.toString())) + salt),
+        "name": form.name,
+        "token": sha256(String(base.encode(form.passwd)) + salt),
         "salt": salt
-      }).then(async () => {
+      }).then(async (_response) => {
         ElMessage({
           showClose: true,
           message: '登录成功！',
@@ -41,7 +41,7 @@ const onLogin = async () => {
           showClose: true,
           message: error.response === undefined ? "网络错误！" : error.response.data.msg,
           center: true,
-          type: 'error'
+          type: error.response === undefined ? 'warning' : 'error'
         })
         if (error.response === undefined) {
           return
@@ -76,7 +76,7 @@ const onLogin = async () => {
           </el-form-item>
           <el-button type="primary" style="width: 100%; margin-top: 1.5vh;" @click="onLogin(formRef)">登录</el-button>
           <el-container style="width: 100%; margin-top: 2vh;">
-            <label style="margin: auto;">
+            <label style="margin: auto; color: rgba(255, 255, 255, 0.8);">
               没有账号？
               <a href="/register" style="text-decoration: none; color: #409eff; text-shadow: 0 0 12px #409eff">注册</a>
             </label>

@@ -40,6 +40,19 @@ onMounted(async () => {
     <el-button @click="jump('/login')" class="navbar-btn" v-if="!userID">
       登录
     </el-button>
+    <el-dropdown trigger="click" v-else>
+      <el-button class="navbar-btn" round>
+        菜单
+      </el-button>
+      <template #dropdown>
+        <!-- 此处跳转链接，暂未设计 -->
+        <el-dropdown-item>Line1</el-dropdown-item>
+        <el-dropdown-item>Line2</el-dropdown-item>
+        <el-dropdown-item>Line3</el-dropdown-item>
+        <el-dropdown-item disabled>Line4</el-dropdown-item>
+        <el-dropdown-item divided>Line5</el-dropdown-item>
+      </template>
+    </el-dropdown>
   </el-header>
 </template>
 
