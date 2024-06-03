@@ -191,7 +191,7 @@ watch(form, async (value, oldValue) => {
       <el-container class="register-form-container">
         <el-form class="register-form" ref="formRef" :model="form" :rules="rules" label-position="left" label-width="80px">
           <el-container class="register-form-div">
-            <img src="../components/icons/phy-title.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%);" />
+            <img src="../components/icons/phy-logo.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%);" />
           </el-container>
           <el-container class="register-form-div">
             <el-text class="register-form-title">注册</el-text>

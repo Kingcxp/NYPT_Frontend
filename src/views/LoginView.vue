@@ -63,7 +63,7 @@ const onLogin = async () => {
       <el-container class="login-form-container">
         <el-form class="login-form" ref="formRef" :model="form" :rules="rules" label-position="left" label-width="80px">
           <el-container class="login-form-div">
-            <img src="../components/icons/phy-title.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%);"/>
+            <img src="../components/icons/phy-logo.png" style="width: 100%; height: auto; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.32)) brightness(135%);"/>
           </el-container>
           <el-container class="login-form-div">
             <el-text class="login-form-title">登录</el-text>
