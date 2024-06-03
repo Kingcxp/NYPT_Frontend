@@ -5,6 +5,13 @@
 ## 介绍
 TODO
 
+## 测试运行项目
+```
+# 该项目使用 npm 构建，你应当在此之前先安装 nodejs 运行时 (npm)，以启动该项目
+npm install
+npm run dev
+```
+
 ## 软件架构
 本项目暂时为网络应用项目，目前分为前端、后端以及衍生项目  
 前端使用Node.js、Vue、Axios、Javascript、HTML、CSS、Element UI等组成成分，构建出造型美观，使用方便流畅的网页用户界面。  
@@ -101,18 +108,6 @@ Vue项目初始化导引：[菜鸟教程](https://www.runoob.com/vue3/vue3-insta
 
     来运行获取到的Docker容器。
     Docker容器的工作环境已经配置完成，之后的工作可在Docker容器中使用统一的环境配置进行。
-
-    Vim美化+功能优化配置：  
-    在这里我们选择安装vim-fast来让vim-fast尽可能接近vscode的效果。  
-    根据[Gitee vim-fast](https://gitee.com/mirrorvim/vim-fast)的README来安装配置完全不会有问题（当然我不知道root用户装会不会有问题）所以在此不赘述配置过程。  
-    介绍一下一些基础功能的打开方式：  
-    在NORMAL模式下按下`,n`打开资源管理器，可以像vscode一样自由浏览文件夹。  
-    在NORMAL模式下按下`,,t`打开一个纵向终端窗口，告别手动tmux。  
-    在NORMAL模式下按下`,,T`打开一个横向终端窗口，即与vscode完全一致的终端位置。  
-    所有的窗口都可以通过鼠标拖动缩放，鼠标右键添加了复制粘贴等功能。  
-    其它功能我也不会，自行摸索，原版vim所有的快捷键均仍适用。  
-    ~~界面主题可修改但我不会。~~  
-    ~~Vue的代码补全我也不会配置。~~
 
 ## 使用说明
 因为一些成员可能是第一次使用Git进行多人协作项目，因此，在此我们以TestGit(<https://gitee.com/kingcq2004/test-git.git)测试仓库为例详细解释一下步骤：>  
