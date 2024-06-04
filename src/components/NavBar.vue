@@ -67,8 +67,8 @@ onMounted(async () => {
         菜单
       </el-button>
       <template #dropdown>
-        <!-- 此处跳转链接，暂未设计 -->
-        <el-dropdown-item>yeee</el-dropdown-item>
+        <!-- TODO: 尚未设计完整 -->
+        <el-dropdown-item>使用手册</el-dropdown-item>
         <el-dropdown-item @click="onLogout" divided>登出</el-dropdown-item>
       </template>
     </el-dropdown>
