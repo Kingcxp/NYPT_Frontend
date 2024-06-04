@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import LoginView from "../views/LoginView.vue"
 import RegisterView from '@/views/RegisterView.vue'
 import axios from 'axios'
@@ -9,16 +8,8 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      alias: '/home',
-      name: 'home',
-      meta: {
-        requireAuth: false
-      },
-      component: HomeView
-    },
-    {
       path: '/login',
+      alias: '/',
       name: 'login',
       meta: {
         requireAuth: false
