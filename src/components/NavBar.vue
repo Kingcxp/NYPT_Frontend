@@ -1,4 +1,5 @@
 <script setup>
+import { ElMessage } from 'element-plus';
 import { ref, onMounted, getCurrentInstance } from 'vue'
 
 
@@ -17,7 +18,8 @@ const tryFetch = async () => {
     userID.value = response.data.user_id
     emit('userID', response.data.user_id)
   }).catch(() => {
-    userID.value = undefined;
+    userID.value = undefined
+    emit('userID', undefined)
   })
   if (userID.value !== undefined) {
     await proxy.$http.post(`/auth/userdata/user_name`).then((response) => {
@@ -26,6 +28,26 @@ const tryFetch = async () => {
       userName.value = '';
     })
   }
+}
+
+const onLogout = async () => {
+  await proxy.$http.get(`/auth/logout`).then((response) => {
+    userID.value = undefined
+    emit('userID', undefined)
+    ElMessage({
+      showClose: true,
+      message: '登出成功！',
+      center: true,
+      type: 'success'
+    })
+  }).catch((error) => {
+    ElMessage({
+      showClose: true,
+      message: '网络错误！',
+      center: true,
+      type: 'warning'
+    })
+  })
 }
 
 onMounted(async () => {
@@ -46,11 +68,8 @@ onMounted(async () => {
       </el-button>
       <template #dropdown>
         <!-- 此处跳转链接，暂未设计 -->
-        <el-dropdown-item>Line1</el-dropdown-item>
-        <el-dropdown-item>Line2</el-dropdown-item>
-        <el-dropdown-item>Line3</el-dropdown-item>
-        <el-dropdown-item disabled>Line4</el-dropdown-item>
-        <el-dropdown-item divided>Line5</el-dropdown-item>
+        <el-dropdown-item>yeee</el-dropdown-item>
+        <el-dropdown-item @click="onLogout" divided>登出</el-dropdown-item>
       </template>
     </el-dropdown>
   </el-header>
