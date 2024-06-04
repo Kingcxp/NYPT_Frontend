@@ -22,7 +22,7 @@ const tryFetch = async () => {
     emit('userID', undefined)
   })
   if (userID.value !== undefined) {
-    await proxy.$http.post(`/auth/userdata/user_name`).then((response) => {
+    await proxy.$http.get(`/auth/userdata/user_name`).then((response) => {
       userName.value = response.data.name;
     }).catch(() => {
       userName.value = '';

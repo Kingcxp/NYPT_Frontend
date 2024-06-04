@@ -20,7 +20,7 @@ const loadPage = async () => {
     noticeAutoFetcher = setInterval(async () => {
       await proxy.$http.get(`/notice/total`).then((resp) => {
         noticeTotal.value = parseInt(resp.data)
-        loading.value = true
+        loading.value = false
         clearInterval(noticeAutoFetcher)
       })
     }, timeout)
@@ -30,7 +30,7 @@ const loadPage = async () => {
 watch(loading, async (value) => {
   if (!value) {
     for (let page = 1; page <= noticeTotal.value; ++page) {
-      await proxy.$http.get(`notice/${page}`).then((response) => {
+      await proxy.$http.get(`/notice/${page}`).then((response) => {
         notices.value[page - 1] = response.data
       })
     }
