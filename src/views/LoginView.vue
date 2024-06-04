@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
+import { useRouter } from 'vue-router'
 import Base64 from '@/utils/Base64'
 import { sha256 } from 'js-sha256'
 import { ElMessage } from 'element-plus'
@@ -10,6 +11,7 @@ import FootBar from '@/components/FootBar.vue'
 
 const base = new Base64()
 const { proxy } = getCurrentInstance()
+const router = useRouter()
 
 const formRef = ref(null)
 const form = reactive({
@@ -36,6 +38,7 @@ const onLogin = async () => {
           center: true,
           type: 'success'
         })
+        router.push({path: '/'})
       }).catch((error) => {
         ElMessage({
           showClose: true,
