@@ -40,7 +40,7 @@ const onLogout = async () => {
       center: true,
       type: 'success'
     })
-  }).catch((error) => {
+  }).catch((_error) => {
     ElMessage({
       showClose: true,
       message: '网络错误！',

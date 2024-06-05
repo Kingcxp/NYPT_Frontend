@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import axios from 'axios'
+import axios from "@/utils/AxiosInstance"
 import { ElMessage } from 'element-plus'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from "@/views/LoginView.vue"
 import RegisterView from '@/views/RegisterView.vue'
+import TimerView from '@/views/TimerView.vue'
 
 
 const router = createRouter({
@@ -35,28 +36,72 @@ const router = createRouter({
         notAllowedWhenAuth: true,
       },
       component: RegisterView
+    },
+    {
+      path: '/timer',
+      name: 'timer',
+      meta: {
+        requireAuth: true,
+        identity: 'VolunteerB',
+      },
+      component: TimerView
     }
   ]
 })
 
-router.beforeEach((to, _from, next) => {
-  if (to.meta === undefined || to.meta.requireAuth === undefined || to.meta.requireAuth === false) {
-    next()
+router.beforeEach(async (to, _from) => {
+  if ((to.meta.requireAuth === undefined || to.meta.requireAuth === false) && 
+      (to.meta.notAllowedWhenAuth === undefined || to.meta.notAllowedWhenAuth === false)) {
+    return
   }
-  axios.get(`/auth/id`).then((_response) => {
-    if (to.meta.notAllowedWhenAuth === true) {
-      next({path: '/'})
+  let userID = undefined
+  await axios.get(`/auth/id`).then((response) => {
+    userID = response.data.user_id
+  }).catch((error) => {
+    if (error.response === undefined) {
+      if (to.meta.requireAuth === true) {
+        ElMessage({
+          showClose: true,
+          message: '网络错误！',
+          center: true,
+          type: 'warning'
+        })
+      }
+      return
     }
-    next()
-  }).catch((_error) => {
-    ElMessage({
-      showClose: true,
-      message: '您尚未登录！',
-      center: true,
-      type: 'error'
-    })
-    next({path: '/login'})
+    if (to.meta.requireAuth === true) {
+      ElMessage({
+        showClose: true,
+        message: error.response.msg,
+        center: true,
+        type: 'error'
+      })
+    }
   })
+  if (userID === undefined) {
+    if (to.meta.requireAuth === true) {
+      return '/login'
+    }
+  } else {
+    if (to.meta.notAllowedWhenAuth === true) {
+      return '/'
+    }
+    if (to.meta.identity !== undefined) {
+      let identity = undefined
+      await axios.get(`/auth/userdata/identity`).then((response) => {
+        identity = response.data.identity
+      })
+      if (identity !== to.meta.identity) {
+        ElMessage({
+          showClose: true,
+          message: '这个页面与你的身份不相符！',
+          center: true,
+          type: 'error'
+        })
+        return '/'
+      }
+    }
+  }
 })
 
 export default router

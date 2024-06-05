@@ -1,0 +1,36 @@
+/*!
+ * jQuery ClassyCountdown
+ * www.class.pm
+ *
+ * Written by Marius Stanciu - Sergiu <marius@class.pm>
+ * Licensed under the MIT license www.class.pm/LICENSE-MIT
+ * Version 1.0.0
+ *
+ */
+
+.ClassyCountdown-wrapper > div {
+    display: inline-block;
+    position: absolute;
+    width: 100%;
+    top: 2%;
+    left: 20%
+}
+
+.ClassyCountdown-wrapper .ClassyCountdown-minutes {
+    width: 100%;
+    line-height: 1em;
+    position: relative;
+    top: 90%;
+    
+    left: 14%;
+    display: block;
+}
+.ClassyCountdown-wrapper .ClassyCountdown-time {
+    width: 100%;
+    line-height: 1em;
+    position: absolute;
+    top: 40%;
+    text-align: center;
+    left: 25%;
+    display: block;
+}
