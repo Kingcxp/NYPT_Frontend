@@ -4,6 +4,7 @@ import { ElMessage } from 'element-plus'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from "@/views/LoginView.vue"
 import RegisterView from '@/views/RegisterView.vue'
+import TeamCenterView from '@/views/TeamCenterView.vue'
 import TimerView from '@/views/TimerView.vue'
 
 
@@ -36,6 +37,15 @@ const router = createRouter({
         notAllowedWhenAuth: true,
       },
       component: RegisterView
+    },
+    {
+      path: '/team-center',
+      name: 'team-center',
+      meta: {
+        requireAuth: false,
+        identity: 'Team',
+      },
+      component: TeamCenterView
     },
     {
       path: '/timer',
