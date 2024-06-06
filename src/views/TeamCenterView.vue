@@ -47,6 +47,7 @@ const active = ref(1)
 }
 .teamcenter-main-container {
   display: flex;
+  background-color: #181818;
 }
 .teamcenter-aside {
   display: flex;

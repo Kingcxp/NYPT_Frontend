@@ -69,6 +69,7 @@ loadPage()
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background-color: #181818;
 }
 .home-carousel {
   max-height: 64vh;

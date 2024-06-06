@@ -25,5 +25,6 @@ import FootBar from '@/components/FootBar.vue'
   align-items: center;
   flex-direction: column;
   padding: 0;
+  background-color: #181818;
 }
 </style>
