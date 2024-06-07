@@ -166,10 +166,10 @@ const onLogin = async () => {
   color: white;
 }
 .el-input {
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
 }
 .el-radio-button {
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
   margin-right: 2px;
 }
 </style>
