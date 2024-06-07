@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
-import { ElMessage } from 'element-plus';
+import { ElMessage } from 'element-plus'
+import { Edit, Delete } from '@element-plus/icons-vue'
 
 import NavBar from '@/components/NavBar.vue'
 import FootBar from '@/components/FootBar.vue'
@@ -38,10 +39,9 @@ const rules = {
 
 const newForm = (notLeader) => {
   isLeader.value = !notLeader
-  if (isLeader) {
+  if (isLeader.value) {
     if (leaders.value.length < 2 && leaders.value.length + members.value.length < 5) {
-      leaders.value.push('')
-      index.value = leaders.value.length - 1
+      index.value = leaders.value.length
     } else {
       ElMessage({
         showClose: true,
@@ -53,8 +53,7 @@ const newForm = (notLeader) => {
     }
   } else {
     if (leaders.value.length + members.value.length < 5) {
-      members.value.push('')
-      index.value = members.value.length - 1
+      index.value = members.value.length
     } else {
       ElMessage({
         showClose: true,
@@ -82,29 +81,21 @@ const loadForm = (notLeader, idx) => {
   index.value = idx
   let data = []
   if (isLeader.value) {
-    data = leaders.value[index.value].split(' - ')
+    data = leaders.value[index.value]
   } else {
-    data = members.value[index.value].split(' - ')
+    data = members.value[index.value]
   }
-  form.name = data[0]
-  form.gender = data[1]
-  form.mobile = data[2]
-  form.identity = data[3]
-  form.academy = data[4]
-  form.profession = data[5]
-  form.qq = data[6]
-  form.email = data[7]
+  form = data
   dialogVisible.value = true
 }
 
 const saveForm = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      let formStr = `${form.name} - ${form.gender} - ${form.mobile} - ${form.identity} - ${form.academy} - ${form.profession} - ${form.qq} - ${form.email}`
-      if (isLeader) {
-        leaders.value[index.value] = formStr
+      if (isLeader.value) {
+        leaders.value[index.value] = form
       } else {
-        members.value[index.value] = formStr
+        members.value[index.value] = form
       }
       dialogVisible.value = false
     }
@@ -148,18 +139,41 @@ const removeForm = (notLeader, idx) => {
         </el-menu>
       </el-aside>
       <el-main class="teamcenter-main">
-        <el-container class="teamcenter-main-container" v-if="active === 1">
+        <el-container class="teamcenter-content-container" v-if="active === 1">
           <label class="teamcenter-info-title">领队信息</label>
-          <el-button class="teamcenter-info-add"></el-button>
+          <label class="teamcenter-info-tip">(最多两名领队，队伍总人数不得超过5人)</label>
+          <el-container class="teamcenter-info-container" v-for="(item, idx) in leaders" >
+            <label class="teamcenter-info-content">
+              {{ item }}
+            </label>
+            <el-button class="teamcenter-info-button" type="primary" :icon="Edit" circle />
+            <el-button class="teamcenter-info-button" type="danger" :icon="Delete" circle />
+          </el-container>
+          <el-button class="teamcenter-info-add" @click="newForm(false)">
+            <el-icon class="teamcenter-info-icon"><Plus /></el-icon>
+            添加条目……
+          </el-button>
           <label class="teamcenter-info-title">队员信息</label>
+          <label class="teamcenter-info-tip">(队伍总人数不得超过5人)</label>
+          <el-container class="teamcenter-info-container" v-for="(item, idx) in members" >
+            <label class="teamcenter-info-content">
+              {{ item }}
+            </label>
+            <el-button class="teamcenter-info-button" type="primary" :icon="Edit" circle />
+            <el-button class="teamcenter-info-button" type="danger" :icon="Delete" circle />
+          </el-container>
+          <el-button class="teamcenter-info-add" @click="newForm(true)">
+            <el-icon class="teamcenter-info-icon"><Plus /></el-icon>
+            添加条目……
+          </el-button>
         </el-container>
-        <el-container class="teamcenter-main-container" v-else-if="active === 2">
+        <el-container class="teamcenter-content-container" v-else-if="active === 2">
           2
         </el-container>
-        <el-container class="teamcenter-main-container" v-else-if="active === 3">
+        <el-container class="teamcenter-content-container" v-else-if="active === 3">
           3
         </el-container>
-        <el-container class="teamcenter-main-container" v-else-if="active === 4">
+        <el-container class="teamcenter-content-container" v-else-if="active === 4">
           4
         </el-container>
       </el-main>
@@ -216,12 +230,16 @@ const removeForm = (notLeader, idx) => {
 }
 .teamcenter-main-container {
   display: flex;
-  flex-direction: column
+  flex-direction: row;
 }
 .teamcenter-aside {
   display: flex;
   height: calc(100vh - 140px);
   width: 15vw;
+}
+.teamcenter-content-container {
+  display: flex;
+  flex-direction: column;
 }
 .teamcenter-main {
   display: flex;
@@ -241,14 +259,14 @@ const removeForm = (notLeader, idx) => {
   margin-right: 3vw;
   color: white;
   font-size: x-large;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 .teamcenter-menu-item {
   justify-content: center;
 }
 .teamcenter-menu-text {
   margin-right: 1.5vw;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
   font-size: large;
 }
 .teamcenter-form-item {
@@ -258,6 +276,31 @@ const removeForm = (notLeader, idx) => {
 .teamcenter-info-title {
   color: white;
   font-size: xx-large;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  margin-top: 5vh;
+  margin-bottom: 1vh;
+  text-align: center;
+}
+.teamcenter-info-tip {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: small;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin-bottom: 5vh;
+}
+.teamcenter-info-add {
+  width: 30vw;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.25);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+  margin: 0 auto;
+}
+.teamcenter-info-add:hover {
+  text-shadow: 0 0 2px rgba(64, 158, 255, 0.25);
+  filter: drop-shadow(0 0 2px rgba(64, 158, 255, 0.25));
+}
+.teamcenter-info-icon {
+  margin-right: 12px;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
 }
 </style>
