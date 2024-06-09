@@ -11,6 +11,13 @@ const leaders = ref([])
 const members = ref([])
 const isLeader = ref(false)
 const index = ref(0)
+const contactRef = ref(null)
+const contactForm = reactive({
+  contact: ''
+})
+const contactRule = {
+  contact: [{required: true, message: '未输入联系人姓名！', trigger: 'blur'}],
+}
 const formRef = ref(null)
 const form = reactive({
   name: '',
@@ -202,7 +209,7 @@ const loadForm = (notLeader, idx) => {
 }
 
 const saveForm = () => {
-  formRef.value.validate(async (valid) => {
+  formRef.value.validate((valid) => {
     if (valid) {
       if (isLeader.value) {
         leaders.value[index.value] = {...form}
@@ -220,6 +227,14 @@ const removeForm = (notLeader, idx) => {
   } else {
     members.value.splice(idx, 1)
   }
+}
+
+const upload = () => {
+  contactRef.value.validate(async (valid) => {
+    if (valid) {
+
+    }
+  })
 }
 </script>
 
@@ -276,12 +291,19 @@ const removeForm = (notLeader, idx) => {
     <el-icon class="teamcenter-info-icon"><Plus /></el-icon>
     添加条目……
   </el-button>
-  <el-button class="teamcenter-info-save" type="primary">保存信息</el-button>
+  <label class="teamcenter-info-title">联系人信息</label>
+  <label class="teamcenter-info-tip">(请填写学校联系人信息)</label>
+  <el-form ref="contactRef" :model="contactForm" :rules="contactRule" label-position="left" label-width="120px">
+    <el-form-item style="width: 300px; margin: auto;" label="联系人姓名" prop="contact">
+      <el-input v-model="contactForm.contact" placeholder="请输入联系人姓名" @keyup.enter="upload" clearable/>
+    </el-form-item>
+  </el-form>
+  <el-button class="teamcenter-info-save" type="primary" @click="upload">保存信息</el-button>
 
   <el-dialog v-model="dialogVisible" title="成员信息录入">
     <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="100px">
       <el-form-item class="teamcenter-form-item" label="姓名" prop="name" @keyup.enter="saveForm">
-        <el-input v-model="form.name" placeholder="请输入姓名"/>
+        <el-input v-model="form.name" placeholder="请输入姓名" clearable/>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="性别" prop="gender">
         <el-radio-group v-model="form.gender">
@@ -290,22 +312,22 @@ const removeForm = (notLeader, idx) => {
         </el-radio-group>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="手机号" prop="mobile" @keyup.enter="saveForm">
-        <el-input v-model="form.mobile" placeholder="请输入手机号"/>
+        <el-input v-model="form.mobile" placeholder="请输入手机号" clearable/>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="身份证号" prop="identity" @keyup.enter="saveForm">
-        <el-input v-model="form.identity" placeholder="请输入身份证号"/>
+        <el-input v-model="form.identity" placeholder="请输入身份证号" clearable/>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="学院" prop="academy" @keyup.enter="saveForm">
-        <el-input v-model="form.academy" placeholder="请输入学院"/>
+        <el-input v-model="form.academy" placeholder="请输入学院" clearable/>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="专业" prop="profession" @keyup.enter="saveForm">
-        <el-input v-model="form.profession" placeholder="请输入专业"/>
+        <el-input v-model="form.profession" placeholder="请输入专业" clearable/>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="QQ 号" prop="qq" @keyup.enter="saveForm">
-        <el-input v-model="form.qq" placeholder="请输入 QQ 号"/>
+        <el-input v-model="form.qq" placeholder="请输入 QQ 号" clearable/>
       </el-form-item>
       <el-form-item class="teamcenter-form-item" label="邮箱" prop="email" @keyup.enter="saveForm">
-        <el-input v-model="form.email" placeholder="请输入邮箱"/>
+        <el-input v-model="form.email" placeholder="请输入邮箱" clearable/>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -355,7 +377,7 @@ const removeForm = (notLeader, idx) => {
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
 }
 .teamcenter-info-table {
-  margin-bottom: 3vh;
+  margin-bottom: 1.5vh;
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
 }
 .teamcenter-info-save {

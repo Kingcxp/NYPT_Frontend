@@ -78,7 +78,6 @@ const active = ref(1)
   display: flex;
   height: calc(100vh - 140px);
   width: 85vw;
-  justify-content: center;
   align-items: center;
   flex-direction: column;
 }
