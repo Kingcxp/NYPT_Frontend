@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Edit, Delete } from '@element-plus/icons-vue'
 
@@ -154,7 +154,7 @@ const rules = {
   identity: [{required: true, validator: identityValidator, trigger: 'blur'}],
   academy: [{required: true, message: '未输入学院！', trigger: 'blur'}],
   profession: [{required: true, message: '未输入专业！', trigger: 'blur'}],
-  qq: [{required: true, message: '未输入 QQ 号！', trigger: 'blur'}],
+  qq: [{required: true, validator: qqValidator, trigger: 'blur'}],
   email: [{required: true, validator: emailValidator, trigger: 'blur'}]
 }
 
@@ -232,10 +232,47 @@ const removeForm = (notLeader, idx) => {
 const upload = () => {
   contactRef.value.validate(async (valid) => {
     if (valid) {
-
+      await proxy.$http.post(`/auth/teaminfo/save`, {
+        'leaders': leaders.value,
+        'members': members.value,
+        'contact': contactForm.contact
+      }).then((_response) => {
+        ElMessage({
+          showClose: true,
+          message: '保存信息成功！',
+          center: true,
+          type: 'success'
+        })
+      }).catch((error) => {
+        ElMessage({
+          showClose: true,
+          message: error.response === undefined ? '网络错误！' : error.response.data.msg,
+          center: true,
+          type: error.response === undefined ? 'warning' : 'error'
+        })
+      })
     }
   })
 }
+
+const download = async () => {
+  await proxy.$http.get(`/auth/teaminfo/fetch`).then((response) => {
+    contactForm.contact = response.data.contact
+    leaders.value = response.data.leaders
+    members.value = response.data.members
+  }).catch((error) => {
+    ElMessage({
+      showClose: true,
+      message: error.response === undefined ? '网络错误！' : error.response.data.msg,
+      center: true,
+      type: error.response === undefined ? 'warning' : error
+    })
+  })
+}
+
+onMounted(async () => {
+  await download();
+})
 </script>
 
 <template>
