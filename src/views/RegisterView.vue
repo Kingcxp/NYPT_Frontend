@@ -304,18 +304,3 @@ watch(form, async (value, oldValue) => {
   margin-bottom: 1.2vh !important;
 }
 </style>
-
-<style>
-.el-form-item__label {
-  font-size: larger;
-  color: white;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-}
-.el-input {
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-}
-.el-radio-button {
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-  margin-right: 2px;
-}
-</style>

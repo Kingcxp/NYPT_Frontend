@@ -4,7 +4,7 @@ import { ref, onMounted, getCurrentInstance } from 'vue'
 
 
 const { proxy } = getCurrentInstance()
-const emit = defineEmits(['userID'])
+// const emit = defineEmits(['userID'])
 
 const userID = ref()
 const userName = ref('')
@@ -13,27 +13,10 @@ const jump = (route) => {
   proxy.$router.push(route)
 }
 
-const tryFetch = async () => {
-  await proxy.$http.get(`/auth/id`).then((response) => {
-    userID.value = response.data.user_id
-    emit('userID', response.data.user_id)
-  }).catch(() => {
-    userID.value = undefined
-    emit('userID', undefined)
-  })
-  if (userID.value !== undefined) {
-    await proxy.$http.get(`/auth/userdata/user_name`).then((response) => {
-      userName.value = response.data.name;
-    }).catch(() => {
-      userName.value = '';
-    })
-  }
-}
-
 const onLogout = async () => {
   await proxy.$http.get(`/auth/logout`).then((response) => {
     userID.value = undefined
-    emit('userID', undefined)
+    // emit('userID', undefined)
     ElMessage({
       showClose: true,
       message: '登出成功！',
@@ -51,7 +34,20 @@ const onLogout = async () => {
 }
 
 onMounted(async () => {
-  await tryFetch()
+  await proxy.$http.get(`/auth/id`).then((response) => {
+    userID.value = response.data.user_id
+    // emit('userID', response.data.user_id)
+  }).catch(() => {
+    userID.value = undefined
+    // emit('userID', undefined)
+  })
+  if (userID.value !== undefined) {
+    await proxy.$http.get(`/auth/userdata/user_name`).then((response) => {
+      userName.value = response.data.name;
+    }).catch(() => {
+      userName.value = '';
+    })
+  }
 })
 </script>
 

@@ -13,3 +13,18 @@ body {
   height: 100vh;
   /* background-color: white; */
 }
+
+.el-form-item__label {
+  font-size: larger;
+  color: white;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.el-input, .el-select, .el-button {
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+.el-radio-button {
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+  margin-right: 2px;
+}

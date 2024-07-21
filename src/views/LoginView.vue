@@ -28,9 +28,9 @@ const onLogin = async () => {
     if (valid) {
       let salt = Math.random().toString(36).slice(-4)
       await proxy.$http.post(`/auth/login`, {
-        "name": form.name,
-        "token": sha256(String(base.encode(form.passwd)) + salt),
-        "salt": salt
+        'name': form.name,
+        'token': sha256(String(base.encode(form.passwd)) + salt),
+        'salt': salt
       }).then(async (_response) => {
         ElMessage({
           showClose: true,
@@ -42,7 +42,7 @@ const onLogin = async () => {
       }).catch((error) => {
         ElMessage({
           showClose: true,
-          message: error.response === undefined ? "网络错误！" : error.response.data.msg,
+          message: error.response === undefined ? '网络错误！' : error.response.data.msg,
           center: true,
           type: error.response === undefined ? 'warning' : 'error'
         })
@@ -157,19 +157,5 @@ const onLogin = async () => {
 }
 .login-form-item {
   margin-bottom: 4vh !important;
-}
-</style>
-
-<style>
-.el-form-item__label {
-  font-size: larger;
-  color: white;
-}
-.el-input {
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-}
-.el-radio-button {
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-  margin-right: 2px;
 }
 </style>
