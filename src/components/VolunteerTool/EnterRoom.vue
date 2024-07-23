@@ -1,12 +1,15 @@
 <script setup>
-import { reactive, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import { ElMessage } from 'element-plus'
 
 
 const { proxy } = getCurrentInstance()
-const props = defineProps({
-  roomCount: Number, roundCount: Number
-})
 const emits = defineEmits(['roomdata', 'rule', 'matchType'])
+
+const roomCount = ref(0)
+const roundCount = ref(0)
+const roomOffset = ref(0)
+const roundOffset = ref(0)
 
 const form = reactive({
   roomID: 0,
@@ -15,10 +18,59 @@ const form = reactive({
 })
 
 const onEnter = async () => {
-  await proxy.$http.post('/assist/roomdata', form).then((response) => {
-    
+  await proxy.$http.post('/assist/roomdata', {
+    'roomID': form.roomID,
+    'round': form.round,
+    'token': form.token,
+  }).then((response) => {
+    emits('roomdata', response.data.data)
+    emits('rule', response.data.rule)
+    emits('matchType', response.data.match_type)
+    ElMessage({
+      showClose: true,
+      message: '会场进入成功！计分，启动！',
+      center: true,
+      type: 'success'
+    })
+  }).catch((error) => {
+    if (error.response.status === 400 || error.response.status == 404 || error.response.status == 500) {
+      ElMessage({
+        showClose: true,
+        message: error.response.data.msg,
+        center: true,
+        type: 'warning'
+      })
+    } else {
+      ElMessage({
+        showClose: true,
+        message: '网络错误！',
+        center: true,
+        type: 'warning'
+      })
+    }
   })
 }
+
+onMounted(async () => {
+  await proxy.$http.get(`/assist/total/room`).then((response) => {
+    roomCount.value = response.data.rooms
+    roomOffset.value = response.data.offset
+    form.roomID = response.data.offset
+  })
+  await proxy.$http.get(`/assist/total/round`).then((response) => {
+    roundCount.value = response.data.rounds
+    roundOffset.value = response.data.offset
+    form.round = response.data.offset
+  })
+  if (roundCount.value === 0) {
+    ElMessage({
+      showClose: true,
+      message: '网络错误！',
+      center: true,
+      type: 'warning'
+    })
+  }
+})
 </script>
 
 <template>
@@ -31,7 +83,7 @@ const onEnter = async () => {
         <el-col class="enter-match-col" :span="11">
           <el-form-item :span="6" class="enter-match-item" label="会场编号" prop="roomID">
             <el-select v-model="form.roomID" size="large">
-              <el-option v-for="i in roomCount" :key="i-1" :label="i-1" :value="i-1"/>
+              <el-option v-for="i in roomCount" :key="i+roomOffset-1" :label="i+roomOffset-1" :value="i+roomOffset-1"/>
             </el-select>  
           </el-form-item>
         </el-col>
@@ -39,7 +91,7 @@ const onEnter = async () => {
         <el-col class="enter-match-col" :span="11">
           <el-form-item :span="6" class="enter-match-item" label="比赛轮次" prop="round">
             <el-select v-model="form.round" size="large">
-              <el-option v-for="i in roundCount" :key="i-1" :label="i-1" :value="i-1"/>
+              <el-option v-for="i in roundCount" :key="i+roundOffset-1" :label="i+roundOffset-1" :value="i+roundOffset-1"/>
             </el-select>
           </el-form-item>
         </el-col>

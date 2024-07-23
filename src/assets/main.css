@@ -14,10 +14,15 @@ body {
   /* background-color: white; */
 }
 
-.el-form-item__label {
-  font-size: larger;
+.el-form-item__label, .el-radio__label {
+  font-size: larger !important;
   color: white;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.el-radio__inner {
+  height: 18px !important;
+  width: 18px !important;
 }
 
 .el-input, .el-select, .el-button {
@@ -27,4 +32,8 @@ body {
 .el-radio-button {
   box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
   margin-right: 2px;
+}
+
+.el-menu {
+  border-right: 1px solid #666666;
 }

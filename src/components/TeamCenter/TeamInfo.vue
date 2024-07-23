@@ -368,7 +368,7 @@ onMounted(async () => {
       </el-form-item>
     </el-form>
     <template #footer>
-      <div class="dialog-footer">
+      <div>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="saveForm">
           确定
