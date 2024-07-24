@@ -84,7 +84,7 @@ const active = ref(1)
 .teamcenter-menu-title-container {
   display: flex;
   justify-content: center;
-  padding: 2.5vh 0;
+  padding: 20px 0;
   padding-top: 5vh;
 }
 .teamcenter-menu-title {
