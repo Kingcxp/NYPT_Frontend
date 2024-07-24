@@ -11,11 +11,11 @@ const props = defineProps({
 const selectedQuestion = ref('1')
 
 const teamPositive = ref('team001')
-const memberPositive = ref('1号选手')
+const memberPositive = ref('')
 const teamNegative = ref('team002')
-const memberNegative = ref('1号选手')
-const teamReview = ref('team0003')
-const memberReview = ref('1号选手')
+const memberNegative = ref('')
+const teamReview = ref('team003')
+const memberReview = ref('')
 const teamSpecator = ref('team004')
 
 const judgers = ref([[0, 0, 0]])
@@ -31,43 +31,46 @@ const judgers = ref([[0, 0, 0]])
       </el-radio-group>
     </el-aside>
     <el-main class="tool-control-panel">
-      <el-container class="tool-quesition-showcase interval-helper">
-        <el-text class="control-panel-title">选题：</el-text>
+      <el-text class="control-panel-title">选题操作</el-text>
+      <el-container class="tool-quesition-showcase">
+        <el-text class="control-panel-label">选题：</el-text>
         <el-input class="showcase-display" :value="roomdata.questionMap[selectedQuestion]" placeholder="选题显示在这里！" disabled/>
         <el-button class="showcase-button" type="primary" plain>锁定选题</el-button>
         <el-button class="showcase-button" type="primary" plain>拒绝选题</el-button>
       </el-container>
+      <el-text class="control-panel-title">答题成员</el-text>
       <el-container class="tool-team-select">
         <el-container class="team-select-row interval-helper">
-          <el-text class="control-panel-title">正：</el-text>
-          <el-input class="team-select-team" placeholder="队伍名称" disabled/>
+          <el-text class="control-panel-label">正：</el-text>
+          <el-input class="team-select-team" :value="teamPositive" placeholder="队伍名称" disabled/>
           <el-select class="team-select-partner" placeholder="选择成员"></el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
-          <el-text class="control-panel-title">反：</el-text>
-          <el-input class="team-select-team" placeholder="队伍名称" disabled/>
+          <el-text class="control-panel-label">反：</el-text>
+          <el-input class="team-select-team" :value="teamNegative" placeholder="队伍名称" disabled/>
           <el-select class="team-select-partner" placeholder="选择成员"></el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
-          <el-text class="control-panel-title">评：</el-text>
-          <el-input class="team-select-team" placeholder="队伍名称" disabled/>
+          <el-text class="control-panel-label">评：</el-text>
+          <el-input class="team-select-team" :value="teamReview" placeholder="队伍名称" disabled/>
           <el-select class="team-select-partner" placeholder="选择成员"></el-select>
         </el-container>
-        <el-container class="team-select-row interval-helper">
-          <el-text class="control-panel-title">观：</el-text>
-          <el-input class="team-select-team" placeholder="队伍名称" disabled/>
+        <el-container class="team-select-row">
+          <el-text class="control-panel-label">观：</el-text>
+          <el-input class="team-select-team" :value="teamSpecator" placeholder="队伍名称" disabled/>
         </el-container>
       </el-container>
+      <el-text class="control-panel-title">评委计分</el-text>
       <el-container class="tool-scoreboard">
         <el-container class="scoreboard-col" style="flex: none; width: 80px; padding: 0">
-          <el-text class="control-panel-title interval-helper" style="line-height: 38px;">正：</el-text>
-          <el-text class="control-panel-title interval-helper" style="line-height: 38px;">反：</el-text>
-          <el-text class="control-panel-title interval-helper" style="line-height: 38px;">评：</el-text>
+          <el-text class="control-panel-label interval-helper" style="line-height: 38px;">正：</el-text>
+          <el-text class="control-panel-label interval-helper" style="line-height: 38px;">反：</el-text>
+          <el-text class="control-panel-label" style="line-height: 38px;">评：</el-text>
         </el-container>
         <el-container class="scoreboard-col" v-for="i in judgers.length">
           <el-input-number class="scoreboard-number interval-helper" :min="0" :max="10" v-model="judgers[i-1][0]"/>
           <el-input-number class="scoreboard-number interval-helper" :min="0" :max="10" v-model="judgers[i-1][1]"/>
-          <el-input-number class="scoreboard-number interval-helper" :min="0" :max="10" v-model="judgers[i-1][2]"/>
+          <el-input-number class="scoreboard-number" :min="0" :max="10" v-model="judgers[i-1][2]"/>
         </el-container>
         <el-container class="scoreboard-col" style="flex: none; width: 80px;">
           <el-button type="primary" class="scoreboard-button" @click="judgers.push([0, 0, 0])" plain>
@@ -111,14 +114,21 @@ const judgers = ref([[0, 0, 0]])
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 10px;
 }
 .tool-quesition-showcase {
-  margin-top: 10px;
   flex: none;
 }
-.control-panel-title {
+.control-panel-label {
   width: 80px;
   cursor: default;
+}
+.control-panel-title {
+  font-size: x-large;
+  color: white;
+  cursor: default;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  margin: 10px auto;
 }
 .showcase-display {
   width: calc((100vw - 420px) / 2 - 15px);
@@ -131,7 +141,6 @@ const judgers = ref([[0, 0, 0]])
 .tool-team-select {
   flex: none;
   flex-wrap: wrap;
-  margin-top: 20px;
 }
 .team-select-row {
   flex-direction: row;
@@ -149,7 +158,6 @@ const judgers = ref([[0, 0, 0]])
   display: inline-flex;
   flex: none;
   flex-direction: row;
-  margin-top: 20px;
 }
 .scoreboard-col {
   flex-direction: column;
