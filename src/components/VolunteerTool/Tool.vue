@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 
 
 const props = defineProps({
@@ -8,7 +9,7 @@ const props = defineProps({
   rule: String
 })
 
-const selectedQuestion = ref('1')
+const selectedQuestion = ref('-1')
 
 const teamPositive = ref('team001')
 const memberPositive = ref('')
@@ -19,14 +20,80 @@ const memberReview = ref('')
 const teamSpecator = ref('team004')
 
 const judgers = ref([[0, 0, 0]])
+
+const matchState = ref('QUESTION')
+
+const onRefuse = () => {
+  if (props.matchType !== 'NORMAL' || matchState.value !== 'QUESTION') {
+    return
+  }
+  props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
+  selectedQuestion.value = '-1'
+  ElMessage({
+    showClose: true,
+    message: '选题已被拒绝！',
+    center: true,
+    type: 'error'
+  })
+}
+const onConfirm = () => {
+  if (selectedQuestion.value === '-1' || matchState.value !== 'QUESTION') {
+    return
+  }
+  props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
+  matchState.value = 'SUBMIT'
+  ElMessage({
+    showClose: true,
+    message: '选题已经锁定！',
+    center: true,
+    type: 'warning'
+  })
+}
+const onSave = () => {
+  if (matchState.value !== 'SUBMIT') {
+    return
+  }
+  // TODO
+  matchState.value = 'NEXT'
+  ElMessage({
+    showClose: true,
+    message: '本场记录已经保存！',
+    center: true,
+    type: 'success'
+  })
+  ElMessage({
+    showClose: true,
+    message: '注意：只是保存在页面中，刷新页面也意味着丢失！',
+    center: true,
+    type: 'warning'
+  })
+}
+const onNext = () => {
+  if (matchState.value !== 'NEXT') {
+    return
+  }
+  // TODO
+  selectedQuestion.value = '-1'
+  matchState.value = 'QUESTION'
+  ElMessage({
+    showClose: true,
+    message: '下一轮开始！',
+    center: true,
+    type: 'success'
+  })
+}
 </script>
 
 <template>
   <el-container class="tool-main-container">
     <el-aside class="tool-question-list-wrapper">
       <el-radio-group class="tool-question-list" v-model="selectedQuestion">
-        <el-radio class="tool-question" v-for="[id, question] in Object.entries(roomdata.questionMap)" :value="id" :disabled="question.startsWith('[!Disabled]')">
-          {{ (id < 10 ? ' 0' : ' ') + id + ' ' + question }}
+        <el-radio
+          class="tool-question"
+          v-for="[id, question] in Object.entries(roomdata.questionMap)"
+          :value="id" :disabled="question.endsWith('[!Disabled]') || matchState !== 'QUESTION'"
+        >
+          {{ (id < 10 ? ' 0' : ' ') + id + ' ' + question.replace('[!Disabled]', '') }}
         </el-radio>
       </el-radio-group>
     </el-aside>
@@ -34,9 +101,20 @@ const judgers = ref([[0, 0, 0]])
       <el-text class="control-panel-title">选题操作</el-text>
       <el-container class="tool-quesition-showcase">
         <el-text class="control-panel-label">选题：</el-text>
-        <el-input class="showcase-display" :value="roomdata.questionMap[selectedQuestion]" placeholder="选题显示在这里！" disabled/>
-        <el-button class="showcase-button" type="primary" plain>锁定选题</el-button>
-        <el-button class="showcase-button" type="primary" plain>拒绝选题</el-button>
+        <el-tooltip
+          :content="matchState === 'QUESTION' ? '选题尚未锁定！' : '选题已经锁定！'"
+          placement="top"
+          effect="dark"
+        >
+          <el-input class="showcase-display" :value="(roomdata.questionMap[selectedQuestion] || '').replace('[!Disabled]', '')" placeholder="选题显示在这里！" disabled/>
+        </el-tooltip>
+        <el-button
+          class="showcase-button"
+          :type="matchState === 'QUESTION' ? 'success' : 'primary'"
+          :plain="matchState === 'QUESTION' ? false : true"
+          @click="onConfirm"
+        >锁定选题</el-button>
+        <el-button class="showcase-button" type="danger" @click="onRefuse" plain>拒绝选题</el-button>
       </el-container>
       <el-text class="control-panel-title">答题成员</el-text>
       <el-container class="tool-team-select">
@@ -73,17 +151,21 @@ const judgers = ref([[0, 0, 0]])
           <el-input-number class="scoreboard-number" :min="0" :max="10" v-model="judgers[i-1][2]"/>
         </el-container>
         <el-container class="scoreboard-col" style="flex: none; width: 80px;">
-          <el-button type="primary" class="scoreboard-button" @click="judgers.push([0, 0, 0])" plain>
-            添加评委
-          </el-button>
-          <el-button type="danger" class="scoreboard-button" @click="judgers.pop()" plain>
-            减少评委
-          </el-button>
+          <el-button type="primary" class="scoreboard-button" @click="judgers.push([0, 0, 0])" plain>添加评委</el-button>
+          <el-button type="danger" class="scoreboard-button" @click="judgers.pop()" plain>减少评委</el-button>
         </el-container>
       </el-container>
       <el-container class="tool-submit-dock">
-        <el-button type="primary">暂存本场结果</el-button>
-        <el-button type="primary">下一场</el-button>
+        <el-button
+          :type="matchState === 'SUBMIT' ? 'success' : 'primary'"
+          :plain="matchState === 'SUBMIT' ? false : true"
+          @click="onSave"
+        >暂存本场结果</el-button>
+        <el-button
+          :type="matchState === 'NEXT' ? 'success' : 'primary'"
+          :plain="matchState === 'NEXT' ? false : true"
+          @click="onNext"
+        >下一场</el-button>
       </el-container>
     </el-main>
   </el-container>
@@ -128,7 +210,7 @@ const judgers = ref([[0, 0, 0]])
   color: white;
   cursor: default;
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
-  margin: 10px auto;
+  margin: 20px auto 10px auto;
 }
 .showcase-display {
   width: calc((100vw - 420px) / 2 - 15px);
@@ -170,7 +252,7 @@ const judgers = ref([[0, 0, 0]])
   width: 100%;
 }
 .tool-submit-dock {
-  margin-top: 20px;
+  margin-top: 40px;
   flex: none;
 }
 .scoreboard-button {
