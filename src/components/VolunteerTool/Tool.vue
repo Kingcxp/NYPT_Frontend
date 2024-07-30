@@ -10,6 +10,7 @@ const props = defineProps({
 })
 
 const selectedQuestion = ref('-1')
+const phase = ref(1)
 
 const teamPositive = ref('team001')
 const memberPositive = ref('')
@@ -75,12 +76,23 @@ const onNext = () => {
   // TODO
   selectedQuestion.value = '-1'
   matchState.value = 'QUESTION'
-  ElMessage({
-    showClose: true,
-    message: '下一轮开始！',
-    center: true,
-    type: 'success'
-  })
+  phase.value += 1
+  if (phase.value > roomdata.teamDataList.length) {
+    // TODO
+    ElMessage({
+      showClose: true,
+      message: '本轮比赛已完成！',
+      center: true,
+      type: 'success'
+    })
+  } else {
+    ElMessage({
+      showClose: true,
+      message: '下一场开始！',
+      center: true,
+      type: 'success'
+    })
+  }
 }
 </script>
 
@@ -121,17 +133,23 @@ const onNext = () => {
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">正：</el-text>
           <el-input class="team-select-team" :value="teamPositive" placeholder="队伍名称" disabled/>
-          <el-select class="team-select-partner" placeholder="选择成员"></el-select>
+          <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
+
+          </el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">反：</el-text>
           <el-input class="team-select-team" :value="teamNegative" placeholder="队伍名称" disabled/>
-          <el-select class="team-select-partner" placeholder="选择成员"></el-select>
+          <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
+
+          </el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">评：</el-text>
           <el-input class="team-select-team" :value="teamReview" placeholder="队伍名称" disabled/>
-          <el-select class="team-select-partner" placeholder="选择成员"></el-select>
+          <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
+
+          </el-select>
         </el-container>
         <el-container class="team-select-row">
           <el-text class="control-panel-label">观：</el-text>
@@ -146,13 +164,40 @@ const onNext = () => {
           <el-text class="control-panel-label" style="line-height: 38px;">评：</el-text>
         </el-container>
         <el-container class="scoreboard-col" v-for="i in judgers.length">
-          <el-input-number class="scoreboard-number interval-helper" :min="0" :max="10" v-model="judgers[i-1][0]"/>
-          <el-input-number class="scoreboard-number interval-helper" :min="0" :max="10" v-model="judgers[i-1][1]"/>
-          <el-input-number class="scoreboard-number" :min="0" :max="10" v-model="judgers[i-1][2]"/>
+          <el-input-number
+            class="scoreboard-number interval-helper"
+            :min="0" :max="10"
+            v-model="judgers[i-1][0]"
+            :disabled="matchState === 'NEXT' ? true : false"
+          />
+          <el-input-number
+            class="scoreboard-number interval-helper"
+            :min="0" :max="10"
+            v-model="judgers[i-1][1]"
+            :disabled="matchState === 'NEXT' ? true : false"
+          />
+          <el-input-number
+            class="scoreboard-number"
+            :min="0" :max="10"
+            v-model="judgers[i-1][2]"
+            :disabled="matchState === 'NEXT' ? true : false"
+          />
         </el-container>
         <el-container class="scoreboard-col" style="flex: none; width: 80px;">
-          <el-button type="primary" class="scoreboard-button" @click="judgers.push([0, 0, 0])" plain>添加评委</el-button>
-          <el-button type="danger" class="scoreboard-button" @click="judgers.pop()" plain>减少评委</el-button>
+          <el-button
+            type="primary"
+            class="scoreboard-button"
+            @click="judgers.push([0, 0, 0])"
+            :disabled="matchState === 'NEXT' ? true : false"
+            plain
+          >添加评委</el-button>
+          <el-button
+            type="danger"
+            class="scoreboard-button"
+            @click="judgers.pop()"
+            :disabled="matchState === 'NEXT' ? true : false"
+            plain
+          >减少评委</el-button>
         </el-container>
       </el-container>
       <el-container class="tool-submit-dock">
@@ -165,7 +210,12 @@ const onNext = () => {
           :type="matchState === 'NEXT' ? 'success' : 'primary'"
           :plain="matchState === 'NEXT' ? false : true"
           @click="onNext"
-        >下一场</el-button>
+        >
+          {{
+            phase === ((roomdata.teamDataList || [0]).length)
+              ? '完成本轮比赛！' : '下一场（第 '  + (phase+1) + ' 场）'
+          }}
+        </el-button>
       </el-container>
     </el-main>
   </el-container>

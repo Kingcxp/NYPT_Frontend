@@ -7,9 +7,9 @@ TODO
 
 ## 测试运行项目
 ```
-# 该项目使用 npm 构建，你应当在此之前先安装 nodejs 运行时 (npm)，以启动该项目
-npm install
-npm run dev
+# 你应当在此之前先安装 python3 和 pip，或使用 python 的虚拟环境
+pip install -r requirements.txt
+python NYPT/launcher.py
 ```
 
 ## 软件架构
@@ -29,7 +29,6 @@ Vue项目初始化导引：[菜鸟教程](https://www.runoob.com/vue3/vue3-insta
     Node版本在之后可能有更新的选择，可以在不影响项目构建的情况下安装更新的版本。
     对于Python安装：  
     建议[Python](https://www.python.org/downloads/)版本为python3.10.x或者python3.9.x，这两个版本更加稳定，且不包含3.11.x及其之后的一些软件包的破坏性更新。不过实际上版本可在一定范围内随意，能用即可  
-    ~~不建议配置docker~~
 
 ## 2. Chrome OS / Debian
     根据[Node.js Binary Distributions](https://github.com/nodesource/distributions)能找到，要安装Node.js LTS(v18.x)，对于Debian操作系统，需要执行如下指令：
@@ -74,40 +73,6 @@ Vue项目初始化导引：[菜鸟教程](https://www.runoob.com/vue3/vue3-insta
     ```
 
     来一键补全未安装的python软件包。
-
-    Docker安装：  
-    根据菜鸟教程，使用官方安装脚本自动安装：
-
-    ```sh
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sudo sh get-docker.sh
-    ```
-
-    等待安装完成即可。
-
-    从容器镜像库获取Docker容器：（此后所有docker命令前可能需要sudo）  
-    首先登陆reg.nju.edu.cn：
-
-    ```sh
-    docker login reg.nju.edu.cn
-    ```
-
-    使用个人账号密码（需具有相关权限）或者令牌等均可。  
-    随后使用命令
-
-    ```sh
-    docker pull reg.nju.edu.cn/group/project:version
-    ```
-
-    来获取已经配置完好的Docker容器。  
-    之后使用：
-
-    ```sh
-    docker run -i -t reg.nju.edu.cn/group/project:version
-    ```
-
-    来运行获取到的Docker容器。
-    Docker容器的工作环境已经配置完成，之后的工作可在Docker容器中使用统一的环境配置进行。
 
 ## 使用说明
 因为一些成员可能是第一次使用Git进行多人协作项目，因此，在此我们以TestGit(<https://gitee.com/kingcq2004/test-git.git)测试仓库为例详细解释一下步骤：>  
@@ -157,23 +122,38 @@ Vue项目初始化导引：[菜鸟教程](https://www.runoob.com/vue3/vue3-insta
 对项目内容进行修改编写时，应当首先拉取更新远程仓库的master分支到本地master分支。  
 随后将master分支合并到自己的分支，并对负责的内容进行编写，编写完成后，在指定的文件中填写好自己的更新日志，大致描述这次更新完成了什么内容。
 依照上述Git流程完成本次更新的提交。
+为了便于整理和查找，我们对 git 提交的规范也有一定的要求：
+```sh
+feat: 新增功能
+fix: 修复bug
+docs: 文档更新
+style: 代码格式（不影响代码运行的变动）
+refactor: 重构（即不是新增功能，也不是修改bug的代码变动）
+perf: 性能优化
+test: 增加测试
+chore: 构建过程或辅助工具的变动
+revert: 回滚到上一个版本
+build: 构建系统升级
+ci: 变更持续集成配置
+```
 
 ## Flask项目结构及编写规范
 根据研究，我们将Flask项目结构参照Nonebot机器人项目结构重新编排，组成了如下的插件式项目结构：
 
 ```sh
 |-- Flask
-    |-- app
-    |   |-- plugins
-    |   |   |-- example_plugin1
-    |   |   |   |-- __init__.py
-    |   |   |   |-- example_plugin1.py
-    |   |   |-- example_plugin2
-    |   |       |-- __init__.py
-    |   |       |-- example_plugin2.py
-    |   |-- __init__.py
-    |   |-- manager.py
-    |-- launcher.py
+|   |-- app
+|   |   |-- plugins
+|   |   |   |-- example_plugin1
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- example_plugin1.py
+|   |   |   |-- example_plugin2
+|   |   |       |-- __init__.py
+|   |   |       |-- example_plugin2.py
+|   |   |-- __init__.py
+|   |   |-- manager.py
+|   |-- launcher.py
+|-- viewer.py
 ```
 
 ### Flask插件编写方式
@@ -483,3 +463,4 @@ onUpdated(() => {
 })
 </script>
 ```
+
