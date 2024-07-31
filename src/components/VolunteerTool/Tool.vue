@@ -26,10 +26,13 @@ const phase = ref(1)
 
 const teamReport = ref('team001')
 const memberReport = ref('')
+const membersReport = ref([])
 const teamOppose = ref('team002')
 const memberOppose = ref('')
+const membersOppose = ref([])
 const teamReview = ref('team003')
 const memberReview = ref('')
+const membersReview = ref([])
 const teamSpecator = ref('team004')
 
 const judgers = ref([[0, 0, 0]])
@@ -236,22 +239,37 @@ const dialogConfirm = () => {
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">正：</el-text>
           <el-input class="team-select-team" :value="teamReport" placeholder="队伍名称" disabled/>
-          <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
-
+          <el-select v-model="memberReport" class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
+            <el-option
+              v-for="[index, member] in membersReport.entries()"
+              :key="index"
+              :label="member"
+              :value="member"
+            />
           </el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">反：</el-text>
           <el-input class="team-select-team" :value="teamOppose" placeholder="队伍名称" disabled/>
-          <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
-
+          <el-select v-model="memberOppose" class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
+            <el-option
+              v-for="[index, member] in membersOppose.entries()"
+              :key="index"
+              :label="member"
+              :value="member"
+            />
           </el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">评：</el-text>
           <el-input class="team-select-team" :value="teamReview" placeholder="队伍名称" disabled/>
-          <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
-
+          <el-select v-model="memberReview" class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
+            <el-option
+              v-for="[index, member] in membersReview.entries()"
+              :key="index"
+              :label="member"
+              :value="member"
+            />
           </el-select>
         </el-container>
         <el-container class="team-select-row">
