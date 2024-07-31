@@ -1,21 +1,33 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
+import CUPTRule from '@/utils/PTRules/CUPT'
+import JSYPTRule from '@/utils/PTRules/JSYPT'
 
+
+const { proxy } = getCurrentInstance()
 
 const props = defineProps({
   roomdata: Object,
   matchType: String,
-  rule: String
+  rule: String,
+  roomID: Number,
+  round: Number,
 })
+let PTRules = {
+  CUPT: CUPTRule,
+  JSYPT: JSYPTRule
+}
+
+const dialogVisible = ref(false)
 
 const selectedQuestion = ref('-1')
 const phase = ref(1)
 
-const teamPositive = ref('team001')
-const memberPositive = ref('')
-const teamNegative = ref('team002')
-const memberNegative = ref('')
+const teamReport = ref('team001')
+const memberReport = ref('')
+const teamOppose = ref('team002')
+const memberOppose = ref('')
 const teamReview = ref('team003')
 const memberReview = ref('')
 const teamSpecator = ref('team004')
@@ -24,10 +36,14 @@ const judgers = ref([[0, 0, 0]])
 
 const matchState = ref('QUESTION')
 
+let roundPlayerRecordList = []
+let refusedQuestionList = []
+
 const onRefuse = () => {
   if (props.matchType !== 'NORMAL' || matchState.value !== 'QUESTION') {
     return
   }
+  refusedQuestionList.push(selectedQuestion.value)
   props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
   selectedQuestion.value = '-1'
   ElMessage({
@@ -54,7 +70,83 @@ const onSave = () => {
   if (matchState.value !== 'SUBMIT') {
     return
   }
-  // TODO
+  let repTeamData = props.roomdata.teamDataList.find(
+    team => { return team.name === teamReport.value }
+  )
+  let repPlayerID = repTeamData.playerDataList.find(
+    player => { player.name === memberReport.value }
+  ).id
+  let repScores = []
+  for (let i = 0; i < judgers.value.length; i++) {
+    repScores.push(judgers.value[i][0])
+  }
+  let oppTeamData = props.roomdata.teamDataList.find(
+    team => { return team.name === teamOppose.value }
+  )
+  let oppPlayerID = oppTeamData.playerDataList.find(
+    player => { player.name === memberOppose.value }
+  ).id
+  let oppScores = []
+  for (let i = 0; i < judgers.value.length; i++) {
+    oppScores.push(judgers.value[i][1])
+  }
+  let revTeamData = props.roomdata.teamDataList.find(
+    team => { return team.name === teamReview.value }
+  )
+  let revPlayerID = revTeamData.playerDataList.find(
+    player => { player.name === memberReview.value }
+  ).id
+  let revScores = []
+  for (let i = 0; i < judgers.value.length; i++) {
+    revScores.push(judgers.value[i][2])
+  }
+  roundPlayerRecordList.push([repPlayerID, oppPlayerID, revPlayerID])
+  refusedQuestionList.forEach(question => {
+    repTeamData.recordDataList.push({
+      'round': props.round,
+      'phase': phase.value,
+      'roomID': props.roomID,
+      'questionID': parseInt(question),
+      'masterID': 0,
+      'role': 'X',
+      'score': 0.0,
+      'weight': PTRules[props.rule].getRepScoreWeight(
+        repTeamData.recordDataList, true
+      )
+    })
+  })
+  repTeamData.recordDataList.push({
+    'round': props.round,
+    'phase': phase.value,
+    'roomID': props.roomID,
+    'questionID': parseInt(selectedQuestion.value),
+    'masterID': repPlayerID,
+    'role': 'R',
+    "score": PTRules[props.rule].getScore(repScores),
+    'weight': PTRules[props.rule].getRepScoreWeight(
+      repTeamData.recordDataList, false
+    )
+  })
+  oppTeamData.recordDataList.push({
+    'round': props.round,
+    'phase': phase.value,
+    'roomID': props.roomID,
+    'questionID': parseInt(selectedQuestion.value),
+    'masterID': oppPlayerID,
+    'role': 'O',
+    'score': PTRules[props.rule].getScore(oppScores),
+    'weight': PTRules[props.rule].getOppScoreWeight()
+  })
+  revTeamData.recordDataList.push({
+    'round': props.round,
+    'phase': phase.value,
+    'roomID': props.roomID,
+    'questionID': parseInt(selectedQuestion.value),
+    'masterID': revPlayerID,
+    'role': 'V',
+    'score': PTRules[props.rule].getScore(revScores),
+    'weight': PTRules[props.rule].getRevScoreWeight()
+  })
   matchState.value = 'NEXT'
   ElMessage({
     showClose: true,
@@ -69,23 +161,30 @@ const onSave = () => {
     type: 'warning'
   })
 }
-const onNext = () => {
+const onNext = async() => {
   if (matchState.value !== 'NEXT') {
     return
   }
-  // TODO
+  judgers.forEach(
+    element => {
+      element[0] = element[1] = element[2] = 0
+    }
+  )
+  memberReport.value = memberOppose.value = memberReview.value = ''
   selectedQuestion.value = '-1'
   matchState.value = 'QUESTION'
   phase.value += 1
   if (phase.value > roomdata.teamDataList.length) {
-    // TODO
+    /* TODO: 上传数据 */
     ElMessage({
       showClose: true,
       message: '本轮比赛已完成！',
       center: true,
       type: 'success'
     })
+    dialogVisible.value = true
   } else {
+    // TODO
     ElMessage({
       showClose: true,
       message: '下一场开始！',
@@ -93,6 +192,10 @@ const onNext = () => {
       type: 'success'
     })
   }
+}
+const dialogConfirm = () => {
+  dialogVisible.value = false
+  proxy.$router.push('/')
 }
 </script>
 
@@ -105,7 +208,7 @@ const onNext = () => {
           v-for="[id, question] in Object.entries(roomdata.questionMap)"
           :value="id" :disabled="question.endsWith('[!Disabled]') || matchState !== 'QUESTION'"
         >
-          {{ (id < 10 ? ' 0' : ' ') + id + ' ' + question.replace('[!Disabled]', '') }}
+          {{ (id < 10 ? ' 0' : ' ') + id + ' ' + question.replaceAll('[!Disabled]', '') }}
         </el-radio>
       </el-radio-group>
     </el-aside>
@@ -118,12 +221,12 @@ const onNext = () => {
           placement="top"
           effect="dark"
         >
-          <el-input class="showcase-display" :value="(roomdata.questionMap[selectedQuestion] || '').replace('[!Disabled]', '')" placeholder="选题显示在这里！" disabled/>
+          <el-input class="showcase-display" :value="(roomdata.questionMap[selectedQuestion] || '').replaceAll('[!Disabled]', '')" placeholder="选题显示在这里！" disabled/>
         </el-tooltip>
         <el-button
           class="showcase-button"
-          :type="matchState === 'QUESTION' ? 'success' : 'primary'"
-          :plain="matchState === 'QUESTION' ? false : true"
+          :type="selectedQuestion === '-1' || matchState === 'QUESTION' ? 'success' : 'primary'"
+          :plain="selectedQuestion === '-1' || matchState === 'QUESTION' ? false : true"
           @click="onConfirm"
         >锁定选题</el-button>
         <el-button class="showcase-button" type="danger" @click="onRefuse" plain>拒绝选题</el-button>
@@ -132,14 +235,14 @@ const onNext = () => {
       <el-container class="tool-team-select">
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">正：</el-text>
-          <el-input class="team-select-team" :value="teamPositive" placeholder="队伍名称" disabled/>
+          <el-input class="team-select-team" :value="teamReport" placeholder="队伍名称" disabled/>
           <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
 
           </el-select>
         </el-container>
         <el-container class="team-select-row interval-helper">
           <el-text class="control-panel-label">反：</el-text>
-          <el-input class="team-select-team" :value="teamNegative" placeholder="队伍名称" disabled/>
+          <el-input class="team-select-team" :value="teamOppose" placeholder="队伍名称" disabled/>
           <el-select class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
 
           </el-select>
@@ -219,6 +322,20 @@ const onNext = () => {
       </el-container>
     </el-main>
   </el-container>
+
+  <el-dialog v-model="dialogVisible" align-center>
+    <el-text style="font-size: xx-large;" class="text-info">提示<br></el-text>
+    <el-text>
+      <el-text class="text-success">本轮比赛</el-text><el-text class="text-primary">已经</el-text><el-text class="text-warn">结束</el-text>！<br><el-text class="text-success">感谢</el-text><el-text class="text-error">您</el-text>的<el-text class="text-primary">辛勤付出</el-text>！<br><el-text class="text-warn">即将回到主页。</el-text>
+    </el-text>
+    <template #footer>
+      <div>
+        <el-button @click="dialogConfirm" type="primary" style="color: black;">
+          太棒了！
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
@@ -308,5 +425,20 @@ const onNext = () => {
 .scoreboard-button {
   width: 80px;
   margin: 20px 0;
+}
+.text-success {
+  color: #67C23A;
+}
+.text-warn {
+  color: #E6A23C;
+}
+.text-info {
+  color: #909399;
+}
+.text-error {
+  color: #F56C6C;
+}
+.text-primary {
+  color: #409EFF;
 }
 </style>

@@ -7,9 +7,9 @@ TODO
 
 ## 测试运行项目
 ```
-# 你应当在此之前先安装 python3 和 pip，或使用 python 的虚拟环境
-pip install -r requirements.txt
-python NYPT/launcher.py
+# 该项目使用 npm 构建，你应当在此之前先安装 nodejs 运行时 (npm)，以启动该项目
+npm install
+npm run dev
 ```
 
 ## 软件架构

@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 
 
 const { proxy } = getCurrentInstance()
-const emits = defineEmits(['roomdata', 'rule', 'matchType'])
+const emits = defineEmits(['roomdata', 'rule', 'matchType', 'roomID', 'round'])
 
 const roomCount = ref(0)
 const roundCount = ref(0)
@@ -26,6 +26,8 @@ const onEnter = async () => {
     emits('roomdata', response.data.data)
     emits('rule', response.data.rule)
     emits('matchType', response.data.match_type)
+    emits('roomID', form.roomID)
+    emits('round', form.round)
     ElMessage({
       showClose: true,
       message: '会场进入成功！计分，启动！',

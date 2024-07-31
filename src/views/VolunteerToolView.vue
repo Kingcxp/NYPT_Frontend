@@ -10,6 +10,8 @@ import Tool from '@/components/VolunteerTool/Tool.vue'
 const roomdata = ref({ "questionMap": {} })
 const rule = ref('')
 const matchType = ref('')
+const roomID = ref(1)
+const round = ref(1)
 
 const dialogVisible = ref(false)
 
@@ -36,11 +38,19 @@ onMounted(async () => {
         @roomdata="(data) => { roomdata = data; dialogVisible = true; }"
         @rule="(data) => rule = data"
         @match-type="(data) => matchType = data"
+        @room-i-d="(data) => roomID = data"
+        @round="(data) => round = data"
         v-if="rule === ''"
       />
       <el-container v-else> -->
         <!-- TODO -->
-        <Tool :roomdata="roomdata" :match-type="matchType" :rule="rule"/>
+        <Tool
+          :roomdata="roomdata"
+          :match-type="matchType"
+          :rule="rule"
+          :room-i-d="roomID"
+          :round="round"
+        />
       <!-- </el-container> -->
     </el-container>
     <FootBar />
