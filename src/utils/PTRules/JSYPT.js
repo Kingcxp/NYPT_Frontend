@@ -14,14 +14,18 @@ class JSYPTRule extends RuleInterface {
   }
 
   constructor() {
+    super()
+    this.playerMasterTimesIn1RoundConfig = 2
+    this.playerMasterTimesIn1MatchConfig = 5
+    this.playerRepTimesIn1MatchConfig = 3
     this.banRuleListConfig = [
-      Tuple(TeamType.REPORTER, QuestionType.BAN),
-      Tuple(TeamType.REPORTER, QuestionType.REPORTED),
-      Tuple(TeamType.OPPONENT, QuestionType.OPPOSED)
+      new Tuple(TeamType.REPORTER, QuestionType.BAN),
+      new Tuple(TeamType.REPORTER, QuestionType.REPORTED),
+      new Tuple(TeamType.OPPONENT, QuestionType.OPPOSED)
     ]
     this.specialBanRuleListConfig = [
-      Tuple(TeamType.REPORTER, QuestionType.BAN),
-      Tuple(TeamType.REPORTER, QuestionType.REPORTED)
+      new Tuple(TeamType.REPORTER, QuestionType.BAN),
+      new Tuple(TeamType.REPORTER, QuestionType.REPORTED)
     ]
   }
 
@@ -58,14 +62,14 @@ class JSYPTRule extends RuleInterface {
       let tempQuestionIDLibList = minus(
         questionIDLibList,
         usedQuestionIDList,
-        (itemA, itemB) => { return !itemA.equals(itemB) }
+        (itemA, itemB) => { return itemA !== itemB }
       )
-      let repQRecordSet = new Set(repTeamRecordDataList.map(
-          it => { return Tuple(it.questionID, Tuple(TeamType.REPORTER, it.role)) }
-      ))
-      let oppQRecordSet = new Set(oppTeamRecordDataList.map(
-          it => { return Tuple(it.questionID, Tuple(TeamType.OPPONENT, it.role)) }
-      ))
+      let repQRecordSet = repTeamRecordDataList.map(
+          it => { return new Tuple(it.questionID, new Tuple(TeamType.REPORTER, it.role)) }
+      )
+      let oppQRecordSet = oppTeamRecordDataList.map(
+          it => { return new Tuple(it.questionID, new Tuple(TeamType.OPPONENT, it.role)) }
+      )
       let banRuleList = this.banRuleListConfig
       switch (roundType) {
         case RoundType.SPECIAL:
@@ -113,7 +117,7 @@ class JSYPTRule extends RuleInterface {
     )
     let repBanQuestionIDList = repQRecordList.filter(
       it => {
-        return banRuleList.some(
+        return repBanRuleList.some(
           item => { return item.equals(it[1]) }
         )
       }
@@ -125,7 +129,7 @@ class JSYPTRule extends RuleInterface {
     )
     let oppBanQuestionIDList = oppQRecordList.filter(
       it => {
-        return banRuleList.some(
+        return oppBanRuleList.some(
           item => { return item.equals(it[1]) }
         )
       }
@@ -136,10 +140,10 @@ class JSYPTRule extends RuleInterface {
       minus(
         questionIDList,
         repBanQuestionIDList,
-        (itemA, itemB) => { return !itemA.equals(itemB) }
+        (itemA, itemB) => { return itemA !== itemB }
       ),
       oppBanQuestionIDList,
-      (itemA, itemB) => { return !itemA.equals(itemB) }
+      (itemA, itemB) => { return itemA !== itemB }
     )
   }
 
@@ -165,7 +169,7 @@ class JSYPTRule extends RuleInterface {
     return playerDataList.filter(
       playerData => {
         return roundPlayerRecordList.filter(
-          it => { return it == playerData.id }
+          it => { return it === playerData.id }
         ).length < this.playerMasterTimesIn1RoundConfig
       }
     ).filter(

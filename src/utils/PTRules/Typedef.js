@@ -19,49 +19,9 @@ const RuleType = Object.freeze({
 })
 
 const RoundType = Object.freeze({
-  NORMAL:   '正常模式',
-  SPECIAL:  '自选题模式'
+  NORMAL:   'NORMAL',
+  SPECIAL:  'SPECIAL'
 })
-
-class RecordData {
-  constructor() {
-    this.round = 0
-    this.phase = 0
-    this.roomID = 0
-    this.questionID = 0
-    this.masterID = 0
-    this.role = ''
-    this.score = 0.0
-    this.weight = 0.0
-  }
-  
-  constructor(dict) {
-    this.round = dict.round
-    this.phase = dict.phase
-    this.roomID = dict.roomID
-    this.questionID = dict.questionID
-    this.masterID = dict.masterID
-    this.role = dict.role
-    this.score = dict.score
-    this.weight = dict.weight
-  }
-
-  equals(data) {
-    if (
-      this.round === data.round &&
-      this.phase === data.phase &&
-      this.roomID === data.roomID &&
-      this.questionID === data.questionID &&
-      this.masterID === data.masterID &&
-      this.role === data.role &&
-      this.score === data.score &&
-      this.weight === data.weight
-    ) {
-      return true
-    }
-    return false
-  }
-}
 
 class PlayerData {
   constructor() {
@@ -103,7 +63,6 @@ export {
   QuestionType,
   RuleType,
   RoundType,
-  RecordData,
   PlayerData,
   Tuple,
   minus

@@ -3,31 +3,21 @@ import { TeamType, QuestionType, RoundType, Tuple, minus } from "./Typedef"
 
 
 class CUPTRule extends RuleInterface {
-  static get questionCount() {
-    return 5
-  }
-  static get playerMasterTimesIn1RoundConfig() {
-    return 2
-  }
-  static get playerMasterTimesIn1MatchConfig() {
-    return 5
-  }
-  static get playerRepTimesIn1MatchConfig() {
-    return 3
-  }
-  static get maxRefuseQuestionCount() {
-    return 5
-  }
-
   constructor() {
+    super()
+    this.questionCount = 5
+    this.playerMasterTimesIn1RoundConfig = 2
+    this.playerMasterTimesIn1MatchConfig = 5
+    this.playerRepTimesIn1MatchConfig = 3
+    this.maxRefuseQuestionCount = 5
     this.banRuleListConfig = [
-      Tuple(TeamType.REPORTER, QuestionType.REFUSED),
-      Tuple(TeamType.REPORTER, QuestionType.REPORTED),
-      Tuple(TeamType.OPPONENT, QuestionType.OPPOSED),
-      Tuple(TeamType.OPPONENT, QuestionType.REPORTED)
+      new Tuple(TeamType.REPORTER, QuestionType.REFUSED),
+      new Tuple(TeamType.REPORTER, QuestionType.REPORTED),
+      new Tuple(TeamType.OPPONENT, QuestionType.OPPOSED),
+      new Tuple(TeamType.OPPONENT, QuestionType.REPORTED)
     ]
     this.specialBanRuleListConfig = [
-      Tuple(TeamType.REPORTER, QuestionType.REPORTED)
+      new Tuple(TeamType.REPORTER, QuestionType.REPORTED)
     ]
   }
 
@@ -66,14 +56,14 @@ class CUPTRule extends RuleInterface {
       let tempQuestionIDLibList = minus(
         questionIDLibList,
         usedQuestionIDList,
-        (itemA, itemB) => { return !itemA.equals(itemB) }
+        (itemA, itemB) => { return itemA !== itemB }
       )
-      let repQRecordSet = new Set(repTeamRecordDataList.map(
-        it => { return Tuple(it.questionID, Tuple(TeamType.REPORTER, it.role)) }
-      ))
-      let oppQRecordSet = new Set(oppTeamRecordDataList.map(
-        it => { return Tuple(it.questionID, Tuple(TeamType.OPPONENT, it.role)) }
-      ))
+      let repQRecordSet = repTeamRecordDataList.map(
+        it => { return new Tuple(it.questionID, new Tuple(TeamType.REPORTER, it.role)) }
+      )
+      let oppQRecordSet = oppTeamRecordDataList.map(
+        it => { return new Tuple(it.questionID, new Tuple(TeamType.OPPONENT, it.role)) }
+      )
       let banRuleList = this.banRuleListConfig
       switch (roundType) {
         case RoundType.SPECIAL:
@@ -138,10 +128,10 @@ class CUPTRule extends RuleInterface {
       minus(
         questionIDList,
         repBanQuestionIDList,
-        (itemA, itemB) => { return !itemA.equals(itemB) }
+        (itemA, itemB) => { return itemA !== itemB }
       ),
       oppBanQuestionIDList,
-      (itemA, itemB) => { return !itemA.equals(itemB) }
+      (itemA, itemB) => { return itemA !== itemB }
     )
   }
 
@@ -167,7 +157,7 @@ class CUPTRule extends RuleInterface {
     return playerDataList.filter(
       playerData => {
         return roundPlayerRecordList.filter(
-          it => { return it == playerData.id }
+          it => { return it === playerData.id }
         ).length < this.playerMasterTimesIn1RoundConfig
       }
     ).filter(
@@ -175,13 +165,13 @@ class CUPTRule extends RuleInterface {
         return teamRecordDataList.filter(
           it => { return ['R', 'O', 'V'].includes(it.role) }
         ).filter(
-          it => { return it.masterID == playerData.id }
+          it => { return it.masterID === playerData.id }
         ).length < this.playerMasterTimesIn1MatchConfig
       }
     ).filter(
       playerData => {
         return teamRecordDataList.filter(
-          it => { return it.masterID == playerData.id && it.role == 'R' }
+          it => { return it.masterID === playerData.id && it.role === 'R' }
         ).length < this.playerRepTimesIn1MatchConfig
       }
     ).map(
@@ -236,7 +226,7 @@ class CUPTRule extends RuleInterface {
     } else {
       let oldRepScoreWeight = oldRepScoreWeightList.reduce((a, b) => { return a < b ? a : b })
       let refusedQuestionCount = teamRecordDataList.filter(
-        it => { return it.role == 'X' }
+        it => { return it.role === 'X' }
       ).length
       return (isRefuse && refusedQuestionCount >= this.maxRefuseQuestionCount)
         ? oldRepScoreWeight - 0.2 : oldRepScoreWeight

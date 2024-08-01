@@ -1,5 +1,5 @@
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import CUPTRule from '@/utils/PTRules/CUPT'
 import JSYPTRule from '@/utils/PTRules/JSYPT'
@@ -15,8 +15,8 @@ const props = defineProps({
   round: Number,
 })
 let PTRules = {
-  CUPT: CUPTRule,
-  JSYPT: JSYPTRule
+  CUPT:   new CUPTRule(),
+  JSYPT:  new JSYPTRule(),
 }
 
 const dialogVisible = ref(false)
@@ -41,12 +41,91 @@ const matchState = ref('QUESTION')
 
 let roundPlayerRecordList = []
 let refusedQuestionList = []
+let usedQuestionList = []
+
+
+const nextRound = () => {
+  // ! 加载队名
+  let len = props.roomdata.teamDataList
+  if (len == 3) {
+    teamSpecator.value = '无观摩方'
+  } else {
+    teamSpecator.value = props.roomdata.teamDataList[3].name
+  }
+  teamReport.value = props.roomdata.teamDataList[0].name
+  teamOppose.value = props.roomdata.teamDataList[1].name
+  teamReview.value = props.roomdata.teamDataList[2].name
+
+  props.roomdata.teamDataList.push(props.roomdata.teamDataList.shift())
+  
+  // ! 读取记录
+  let repTeamRecordDataList = props.roomdata.teamDataList.find(
+    element => { return element.name === teamReport.value }
+  ).recordDataList
+  let repPlayerDataList = props.roomdata.teamDataList.find(
+    element => { return element.name === teamReport.value }
+  ).playerDataList
+  let oppTeamRecordDataList = props.roomdata.teamDataList.find(
+    element => { return element.name === teamOppose.value }
+  ).recordDataList
+  let oppPlayerDataList = props.roomdata.teamDataList.find(
+    element => { return element.name === teamOppose.value }
+  ).playerDataList
+  let revTeamRecordDataList = props.roomdata.teamDataList.find(
+    element => { return element.name === teamReview.value }
+  ).recordDataList
+  let revPlayerDataList = props.roomdata.teamDataList.find(
+    element => { return element.name === teamReview.value }
+  ).playerDataList
+
+  // ! 加载可用问题列表
+  let questionIDList = PTRules[props.rule].getOptionalQuestionIDList(
+    repTeamRecordDataList,
+    oppTeamRecordDataList,
+    usedQuestionList,
+    Object.keys(props.roomdata.questionMap),
+    props.matchType
+  )
+  for (let key in Object.keys(props.roomdata.questionMap)) {
+    if (questionIDList.includes(parseInt(key)) && !props.roomdata.questionMap[key].endsWith('[!Disabled]')) {
+      props.roomdata.questionMap[key] += '[!Disabled]'
+    }
+  }
+  
+  // ! 加载本场可用队员
+  let validPlayerIDListReport = PTRules[props.rule].getValidPlayerIDList(
+    roundPlayerRecordList,
+    repTeamRecordDataList,
+    repPlayerDataList
+  )
+  membersReport.value = repPlayerDataList.filter(
+    element => { return validPlayerIDListReport.includes(element.id) }
+  ).map(element => { return element.name })
+
+  let validPlayerIDListOppose = PTRules[props.rule].getValidPlayerIDList(
+    roundPlayerRecordList,
+    oppTeamRecordDataList,
+    oppPlayerDataList
+  )
+  membersOppose.value = oppPlayerDataList.filter(
+    element => { return validPlayerIDListOppose.includes(element.id) }
+  ).map(element => { return element.name })
+
+  let validPlayerIDListReview = PTRules[props.rule].getValidPlayerIDList(
+    roundPlayerRecordList,
+    revTeamRecordDataList,
+    revPlayerDataList
+  )
+  membersReview.value = revPlayerDataList.filter(
+    element => { return validPlayerIDListReview.includes(element.id) }
+  ).map(element => { return element.name })
+}
 
 const onRefuse = () => {
   if (props.matchType !== 'NORMAL' || matchState.value !== 'QUESTION') {
     return
   }
-  refusedQuestionList.push(selectedQuestion.value)
+  refusedQuestionList.push(parseInt(selectedQuestion.value))
   props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
   selectedQuestion.value = '-1'
   ElMessage({
@@ -60,6 +139,7 @@ const onConfirm = () => {
   if (selectedQuestion.value === '-1' || matchState.value !== 'QUESTION') {
     return
   }
+  usedQuestionList.push(parseInt(selectedQuestion.value))
   props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
   matchState.value = 'SUBMIT'
   ElMessage({
@@ -77,7 +157,7 @@ const onSave = () => {
     team => { return team.name === teamReport.value }
   )
   let repPlayerID = repTeamData.playerDataList.find(
-    player => { player.name === memberReport.value }
+    player => { return player.name === memberReport.value }
   ).id
   let repScores = []
   for (let i = 0; i < judgers.value.length; i++) {
@@ -87,7 +167,7 @@ const onSave = () => {
     team => { return team.name === teamOppose.value }
   )
   let oppPlayerID = oppTeamData.playerDataList.find(
-    player => { player.name === memberOppose.value }
+    player => { return player.name === memberOppose.value }
   ).id
   let oppScores = []
   for (let i = 0; i < judgers.value.length; i++) {
@@ -97,7 +177,7 @@ const onSave = () => {
     team => { return team.name === teamReview.value }
   )
   let revPlayerID = revTeamData.playerDataList.find(
-    player => { player.name === memberReview.value }
+    player => { return player.name === memberReview.value }
   ).id
   let revScores = []
   for (let i = 0; i < judgers.value.length; i++) {
@@ -109,7 +189,7 @@ const onSave = () => {
       'round': props.round,
       'phase': phase.value,
       'roomID': props.roomID,
-      'questionID': parseInt(question),
+      'questionID': question,
       'masterID': 0,
       'role': 'X',
       'score': 0.0,
@@ -118,6 +198,10 @@ const onSave = () => {
       )
     })
   })
+  let refusedLen = refusedQuestionList.length
+  for (let i = 0; i < refusedLen; ++i) {
+    refusedQuestionList.pop()
+  }
   repTeamData.recordDataList.push({
     'round': props.round,
     'phase': phase.value,
@@ -168,7 +252,7 @@ const onNext = async() => {
   if (matchState.value !== 'NEXT') {
     return
   }
-  judgers.forEach(
+  judgers.value.forEach(
     element => {
       element[0] = element[1] = element[2] = 0
     }
@@ -177,7 +261,7 @@ const onNext = async() => {
   selectedQuestion.value = '-1'
   matchState.value = 'QUESTION'
   phase.value += 1
-  if (phase.value > roomdata.teamDataList.length) {
+  if (phase.value > props.roomdata.teamDataList.length) {
     /* TODO: 上传数据 */
     ElMessage({
       showClose: true,
@@ -187,7 +271,7 @@ const onNext = async() => {
     })
     dialogVisible.value = true
   } else {
-    // TODO
+    nextRound()
     ElMessage({
       showClose: true,
       message: '下一场开始！',
@@ -200,6 +284,14 @@ const dialogConfirm = () => {
   dialogVisible.value = false
   proxy.$router.push('/')
 }
+
+let first = true
+watch(() => props.roomdata, () => {
+  if (first) {
+    first = false
+    nextRound()
+  }
+})
 </script>
 
 <template>
@@ -241,8 +333,8 @@ const dialogConfirm = () => {
           <el-input class="team-select-team" :value="teamReport" placeholder="队伍名称" disabled/>
           <el-select v-model="memberReport" class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
             <el-option
-              v-for="[index, member] in membersReport.entries()"
-              :key="index"
+              v-for="member in membersReport"
+              :key="member"
               :label="member"
               :value="member"
             />
@@ -253,8 +345,8 @@ const dialogConfirm = () => {
           <el-input class="team-select-team" :value="teamOppose" placeholder="队伍名称" disabled/>
           <el-select v-model="memberOppose" class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
             <el-option
-              v-for="[index, member] in membersOppose.entries()"
-              :key="index"
+              v-for="member in membersOppose"
+              :key="member"
               :label="member"
               :value="member"
             />
@@ -265,8 +357,8 @@ const dialogConfirm = () => {
           <el-input class="team-select-team" :value="teamReview" placeholder="队伍名称" disabled/>
           <el-select v-model="memberReview" class="team-select-partner" placeholder="选择成员" :disabled="matchState === 'NEXT' ? true : false">
             <el-option
-              v-for="[index, member] in membersReview.entries()"
-              :key="index"
+              v-for="member in membersReview"
+              :key="member"
               :label="member"
               :value="member"
             />
