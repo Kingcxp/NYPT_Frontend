@@ -1,5 +1,5 @@
 <script setup>
-import { ref, getCurrentInstance, watch, onMounted } from 'vue'
+import { ref, getCurrentInstance, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import CUPTRule from '@/utils/PTRules/CUPT'
 import JSYPTRule from '@/utils/PTRules/JSYPT'
@@ -13,6 +13,7 @@ const props = defineProps({
   rule: String,
   roomID: Number,
   round: Number,
+  token: String
 })
 let PTRules = {
   CUPT:   new CUPTRule(),
@@ -248,7 +249,7 @@ const onSave = () => {
     type: 'warning'
   })
 }
-const onNext = async() => {
+const onNext = async () => {
   if (matchState.value !== 'NEXT') {
     return
   }
@@ -262,7 +263,33 @@ const onNext = async() => {
   matchState.value = 'QUESTION'
   phase.value += 1
   if (phase.value > props.roomdata.teamDataList.length) {
-    /* TODO: 上传数据 */
+    while (true) {
+      let quit = false
+      await proxy.$http.post(`/assist/upload`, {
+      'roomID': props.roomID,
+      'round': props.round,
+      'token': props.token,
+      'roomdata': props.roomdata
+      }).then((response) => {
+        ElMessage({
+          showClose: true,
+          message: '数据已上传！',
+          center: true,
+          type: 'success'
+        })
+        quit = true
+      }).catch((error) => {
+        ElMessage({
+          showClose: true,
+          message: '啊哦！数据上传失败！重传中，请勿关闭页面！',
+          center: true,
+          type: 'error',
+        })
+      })
+      if (quit) {
+        break
+      }
+    }
     ElMessage({
       showClose: true,
       message: '本轮比赛已完成！',
@@ -285,13 +312,7 @@ const dialogConfirm = () => {
   proxy.$router.push('/')
 }
 
-let first = true
-watch(() => props.roomdata, () => {
-  if (first) {
-    first = false
-    nextRound()
-  }
-})
+onMounted(nextRound)
 </script>
 
 <template>

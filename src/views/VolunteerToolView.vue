@@ -12,46 +12,34 @@ const rule = ref('')
 const matchType = ref('')
 const roomID = ref(1)
 const round = ref(1)
+const token = ref('')
 
 const dialogVisible = ref(false)
-
-// Temporarily added here
-const { proxy } = getCurrentInstance()
-onMounted(async () => {
-  await proxy.$http.post('/assist/roomdata', {
-    'roomID': 1,
-    'round': 1,
-    'token': '',
-  }).then((response) => {
-    roomdata.value = response.data.data
-    rule.value = response.data.rule
-    matchType.value = response.data.match_type
-  })
-})
 </script>
 
 <template>
   <el-container class="volunteer-container">
     <NavBar />
     <el-container class="volunteer-main-container">
-      <!-- <EnterRoom
+      <EnterRoom
         @roomdata="(data) => { roomdata = data; dialogVisible = true; }"
         @rule="(data) => rule = data"
         @match-type="(data) => matchType = data"
         @room-i-d="(data) => roomID = data"
         @round="(data) => round = data"
+        @token="(data) => token = data"
         v-if="rule === ''"
       />
-      <el-container v-else> -->
-        <!-- TODO -->
+      <el-container v-else>
         <Tool
           :roomdata="roomdata"
           :match-type="matchType"
           :rule="rule"
           :room-i-d="roomID"
           :round="round"
+          :token="token"
         />
-      <!-- </el-container> -->
+      </el-container>
     </el-container>
     <FootBar />
   </el-container>
