@@ -185,7 +185,7 @@ watch(form, async (value, oldValue) => {
 </script>
 
 <template>
-    <el-container class="register-container">
+  <el-container class="register-container">
     <NavBar />
     <el-main class="register-main">
       <el-container class="register-form-container">

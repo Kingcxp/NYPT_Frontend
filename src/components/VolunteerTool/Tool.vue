@@ -154,6 +154,15 @@ const onSave = () => {
   if (matchState.value !== 'SUBMIT') {
     return
   }
+  if (teamReport.value.trim() === '' || teamOppose.value.trim() === '' || teamReview.value.trim() === '') {
+    ElMessage({
+      showClose: true,
+      message: '啊哦？你是不是还有东西没填完？',
+      center: true,
+      type: 'error'
+    })
+    return
+  }
   let repTeamData = props.roomdata.teamDataList.find(
     team => { return team.name === teamReport.value }
   )
@@ -345,7 +354,13 @@ onMounted(nextRound)
           :plain="selectedQuestion === '-1' || matchState === 'QUESTION' ? false : true"
           @click="onConfirm"
         >锁定选题</el-button>
-        <el-button class="showcase-button" type="danger" @click="onRefuse" plain>拒绝选题</el-button>
+        <el-button
+          class="showcase-button"
+          type="danger"
+          :plain="matchType === 'NORMAL' && matchState === 'QUESTION' ? false: true"
+          :disabled="matchType === 'NORMAL' && matchState === 'QUESTION' ? false : true"
+          @click="onRefuse"
+        >拒绝选题</el-button>
       </el-container>
       <el-text class="control-panel-title">答题成员</el-text>
       <el-container class="tool-team-select">

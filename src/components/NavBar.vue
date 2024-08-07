@@ -63,8 +63,10 @@ onMounted(async () => {
         菜单
       </el-button>
       <template #dropdown>
-        <!-- TODO: 尚未设计完整 -->
-        <el-dropdown-item>使用手册</el-dropdown-item>
+        <el-dropdown-item @click="jump('/timer')">赛程秒表</el-dropdown-item>
+        <el-dropdown-item @click="jump('/volunteer-tool')">计分工具</el-dropdown-item>
+        <el-dropdown-item @click="jump('/team-center')">团队空间</el-dropdown-item>
+        <el-dropdown-item @click="jump('/user-doc')">使用手册</el-dropdown-item>
         <el-dropdown-item @click="onLogout" divided>登出</el-dropdown-item>
       </template>
     </el-dropdown>

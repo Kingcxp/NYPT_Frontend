@@ -7,6 +7,7 @@ import RegisterView from '@/views/RegisterView.vue'
 import TeamCenterView from '@/views/TeamCenterView.vue'
 import VolunteerToolView from '@/views/VolunteerToolView.vue'
 import TimerView from '@/views/TimerView.vue'
+import DocView from '@/views/DocView.vue'
 
 
 const router = createRouter({
@@ -43,7 +44,7 @@ const router = createRouter({
       path: '/team-center',
       name: 'team-center',
       meta: {
-        requireAuth: false,
+        requireAuth: true,
         identity: 'Team',
       },
       component: TeamCenterView
@@ -52,7 +53,7 @@ const router = createRouter({
       path: '/volunteer-tool',
       name: 'volunteer-tool',
       meta: {
-        requireAuth: false,
+        requireAuth: true,
         identity: 'VolunteerA',
       },
       component: VolunteerToolView
@@ -65,6 +66,14 @@ const router = createRouter({
         identity: 'VolunteerB',
       },
       component: TimerView
+    },
+    {
+      path: '/user-doc',
+      name: 'user-doc',
+      meta: {
+        requireAuth: false,
+      },
+      component: DocView
     }
   ]
 })
