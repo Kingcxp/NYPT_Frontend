@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import FootBar from '@/components/FootBar.vue'
 import TeamInfo from '@/components/TeamCenter/TeamInfo.vue'
+import CompetitionInfo from '@/components/TeamCenter/CompetitionInfo.vue'
 import AwardInfo from '@/components/TeamCenter/AwardInfo.vue'
 
 
@@ -42,7 +43,7 @@ const active = ref(1)
           <TeamInfo />
         </el-container>
         <el-container class="teamcenter-content-container" v-else-if="active === 2">
-          2
+          <CompetitionInfo />
         </el-container>
         <el-container class="teamcenter-content-container" v-else-if="active === 3">
           3
