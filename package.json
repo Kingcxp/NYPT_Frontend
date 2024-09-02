@@ -13,6 +13,7 @@
     "@kangc/v-md-editor": "^2.3.18",
     "axios": "^1.7.2",
     "element-plus": "^2.7.3",
+    "js-confetti": "^0.12.0",
     "js-sha256": "^0.11.0",
     "md-editor-v3": "^4.18.0",
     "vue": "^3.4.21",
