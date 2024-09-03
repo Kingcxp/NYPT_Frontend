@@ -20,37 +20,54 @@ const getNum = (str) => {
 }
 
 const refresh = async () => {
-  currentData.value = []
   teamdata.value = []
-  for (let i = minRooms.value; i <= maxRooms.value; ++i) {
-    await proxy.$http.post(`/assist/roomdata`, {
-      'roomID': i,
-      'round': round.value
-    }).then((response) => {
-      currentData.value.push(response.data.data)
-    })
-  }
-  for (let i in currentData.value) {
-    for (let idx in currentData.value[i].teamDataList) {
-      let tmpRecord = {}
-      for (let id in currentData.value[i].questionMap) {
-        tmpRecord[id] = ''
-      }
-      for (let index in currentData.value[i].teamDataList[idx].recordDataList) {
-        if (
-          currentData.value[i].teamDataList[idx].recordDataList[index].role === 'B' ||
-          currentData.value[i].teamDataList[idx].recordDataList[index].round > round.value
-        ) {
-          continue
+
+  let tempRecords = {}
+  for (let curRound = minRounds.value; curRound <= round.value; ++curRound) {
+    for (let i = minRooms.value; i <= maxRooms.value; ++i) {
+      await proxy.$http.post(`/assist/roomdata`, {
+        'roomID': i,
+        'round': curRound
+      }).then((response) => {
+        if (curRound === minRounds.value) {
+          currentData.value = []
         }
-        tmpRecord[currentData.value[i].teamDataList[idx].recordDataList[index].questionID.toString()]
-          += currentData.value[i].teamDataList[idx].recordDataList[index].role
-      }
-      teamdata.value.push({
-        teamname: currentData.value[i].teamDataList[idx].name,
-        ...tmpRecord
+        currentData.value.push(response.data.data)
+      }).catch((error) => {
+        ElMessage({
+          showClose: true,
+          message: '网络错误！',
+          center: true,
+          type: 'warning'
+        })
       })
     }
+    for (let i in currentData.value) {
+      for (let idx in currentData.value[i].teamDataList) {
+        if (tempRecords[currentData.value[i].teamDataList[idx].name] === undefined) {
+          tempRecords[currentData.value[i].teamDataList[idx].name] = {}
+          for (let id in currentData.value[i].questionMap) {
+            tempRecords[currentData.value[i].teamDataList[idx].name][id] = ''
+          }
+        }
+        for (let index in currentData.value[i].teamDataList[idx].recordDataList) {
+          if (
+            currentData.value[i].teamDataList[idx].recordDataList[index].role === 'B' ||
+            currentData.value[i].teamDataList[idx].recordDataList[index].round > round.value
+          ) {
+            continue
+          }
+          tempRecords[currentData.value[i].teamDataList[idx].name][currentData.value[i].teamDataList[idx].recordDataList[index].questionID.toString()]
+            += currentData.value[i].teamDataList[idx].recordDataList[index].role
+        }
+      }
+    }
+  }
+  for (let key in tempRecords) {
+    teamdata.value.push({
+      teamname: key,
+      ...tempRecords[key]
+    })
   }
   teamdata.value.sort((lhs, rhs) => {
     if (getNum(lhs.teamname) === '' || getNum(rhs.teamname) === '') {
@@ -107,7 +124,7 @@ onMounted(async () => {
 .competition-info-table {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
   width: 80vw;
-  height: 68vh;
+  height: 65vh;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
