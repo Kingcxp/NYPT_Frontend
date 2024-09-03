@@ -2,15 +2,15 @@
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
 
+
 const { proxy } = getCurrentInstance()
 
 const teamdata = ref([])
 const round = ref(1)
 const maxRounds = ref(0)
 const minRounds = ref(0)
-const room = ref(1)
-const maxRooms = ref(0)
-const minRooms = ref(0)
+let maxRooms = 0
+let minRooms = 0
 const currentData = ref([])
 
 const getNum = (str) => {
@@ -24,7 +24,7 @@ const refresh = async () => {
 
   let tempRecords = {}
   for (let curRound = minRounds.value; curRound <= round.value; ++curRound) {
-    for (let i = minRooms.value; i <= maxRooms.value; ++i) {
+    for (let i = minRooms; i <= maxRooms; ++i) {
       await proxy.$http.post(`/assist/roomdata`, {
         'roomID': i,
         'round': curRound
@@ -79,9 +79,8 @@ const refresh = async () => {
 
 onMounted(async () => {
   await proxy.$http.get(`/assist/total/room`).then((response) => {
-    room.value = response.data.offset
-    maxRooms.value = response.data.rooms
-    minRooms.value = response.data.offset
+    maxRooms = response.data.rooms
+    minRooms = response.data.offset
   })
   await proxy.$http.get(`/assist/total/round`).then((response) => {
     round.value = response.data.offset
@@ -125,7 +124,6 @@ onMounted(async () => {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
   width: 80vw;
   height: 65vh;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 </style>
