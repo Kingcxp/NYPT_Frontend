@@ -24,22 +24,26 @@ const refresh = async () => {
 
   let tempRecords = {}
   for (let curRound = minRounds.value; curRound <= round.value; ++curRound) {
+    let withError = false;
     for (let i = minRooms; i <= maxRooms; ++i) {
       await proxy.$http.post(`/assist/roomdata`, {
         'roomID': i,
         'round': curRound
       }).then((response) => {
-        if (curRound === minRounds.value) {
+        if (i === minRooms) {
           currentData.value = []
         }
         currentData.value.push(response.data.data)
       }).catch((error) => {
-        ElMessage({
-          showClose: true,
-          message: '网络错误！',
-          center: true,
-          type: 'warning'
-        })
+        if (!withError) {
+          withError = true
+          ElMessage({
+            showClose: true,
+            message: error.response ? error.response.data.msg : "网络错误！",
+            center: true,
+            type: 'warning'
+          })
+        }
       })
     }
     for (let i in currentData.value) {
