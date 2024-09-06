@@ -24,7 +24,7 @@ const refresh = async () => {
 
   let tempRecords = {}
   for (let curRound = minRounds.value; curRound <= round.value; ++curRound) {
-    let withError = false;
+    let withError = false
     for (let i = minRooms; i <= maxRooms; ++i) {
       await proxy.$http.post(`/assist/roomdata`, {
         'roomID': i,
@@ -41,7 +41,7 @@ const refresh = async () => {
             showClose: true,
             message: error.response ? error.response.data.msg : "网络错误！",
             center: true,
-            type: 'warning'
+            type: error.response ? 'error' : 'warning'
           })
         }
       })
@@ -126,8 +126,8 @@ onMounted(async () => {
 }
 .competition-info-table {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
-  width: 80vw;
-  height: 65vh;
+  max-width: 80vw;
+  max-height: 65vh;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 </style>
