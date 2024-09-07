@@ -55,6 +55,7 @@ const text = ref('\n\
 .doc-container {
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 .doc-main {
   display: flex;
@@ -64,6 +65,7 @@ const text = ref('\n\
   padding: 0;
   color: white;
   background-color: #101010;
+  width: 100vw;
 }
 .doc-preview-container {
   width: 50vw;
