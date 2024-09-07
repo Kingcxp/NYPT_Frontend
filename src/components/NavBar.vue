@@ -63,6 +63,7 @@ onMounted(async () => {
         菜单
       </el-button>
       <template #dropdown>
+        <el-dropdown-item @click="jump('/')">主页</el-dropdown-item>
         <el-dropdown-item @click="jump('/timer')">赛程秒表</el-dropdown-item>
         <el-dropdown-item @click="jump('/volunteer-tool')">计分工具</el-dropdown-item>
         <el-dropdown-item @click="jump('/team-center')">团队空间</el-dropdown-item>

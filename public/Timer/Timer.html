@@ -370,12 +370,12 @@
                 if (items) {
                     clearInterval(interval);
                     items = !items
-                    pause.innerHTML = "continue"
+                    pause.innerHTML = "继续"
                 }
                 else {
                     interval = setInterval('single()', 1000);
                     items = !items
-                    pause.innerHTML = "pause"
+                    pause.innerHTML = "暂停"
                 }
 
             });

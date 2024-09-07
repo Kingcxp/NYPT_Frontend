@@ -58,7 +58,7 @@ const nextRound = () => {
   teamReview.value = props.roomdata.teamDataList[2].name
 
   props.roomdata.teamDataList.push(props.roomdata.teamDataList.shift())
-  
+
   // ! 读取记录
   let repTeamRecordDataList = props.roomdata.teamDataList.find(
     element => { return element.name === teamReport.value }
@@ -92,7 +92,7 @@ const nextRound = () => {
       props.roomdata.questionMap[key] += '[!Disabled]'
     }
   }
-  
+
   // ! 加载本场可用队员
   let validPlayerIDListReport = PTRules[props.rule].getValidPlayerIDList(
     roundPlayerRecordList,
@@ -556,16 +556,16 @@ onMounted(nextRound)
 }
 .scoreboard-col {
   flex-direction: column;
-  padding-right: 20px;
+  padding-right: 10px;
 }
 .interval-helper {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .scoreboard-number {
   width: 100%;
 }
 .tool-submit-dock {
-  margin-top: 40px;
+  margin-top: 20px;
   flex: none;
 }
 .scoreboard-button {

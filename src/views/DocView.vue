@@ -7,49 +7,30 @@ import NavBar from '@/components/NavBar.vue'
 import FootBar from '@/components/FootBar.vue'
 
 
-const text = ref('\
-# md-editor-v3使用教程\n\
-#### 在正常的文本编辑基础上，md-editor-v3能够支持所有的markdown语法，例如：\n\
-# H1\n\
-## H2\n\
-### H3\n\
-#### H4\n\
-##### H5\n\
-###### H6\n\
-**粗体**\n\
-*斜体*\n\
-> 引用\n\
-- 无序列表\n\
-1. 有序列表\n\
-------------------------------------\n\
-|column1|表格|column3|\n\
-|-|-|-|\n\
-|content1|content2|content3|\n\n\
-[链接(md-editor-v3)](http://http://ckang1229.gitee.io/vue-markdown-editor/zh/)\n\
-![这是一张图片的介绍](https://storage.live.com/users/0x297050f96e844eab/myprofile/expressionprofile/profilephoto:UserTileStatic/p?ck=1&ex=720&sid=026FDF0F192065B601E6CC1318636405&fofoff=1)\n\
-``` cpp\n\
-#include <iostream>\n\
+const text = ref('\n\
+# NYPT Assistant 使用指南\n\
+### ✨ By Kingcq 2024.9.7 ✨\n\
+## 新用户\n\
+点击右上角登录按钮前往登录界面，在登录界面可以找到注册按钮。\n\
+在填写完注册信息之后，系统将告知主办方有新的注册请求。\n\
+主办方尽快审核后会通过邮件告知账号密码，此时即可登录账号。\n\
+## 比赛团队\n\
+登录之后，在右上角菜单打开`团队空间`\n\
+请在获得账号后尽快完善`队伍信息`中的所有团队信息并点击页面底部的`保存信息`将信息提交到服务器\n\
+> #### 请多次检查信息是否填写正确，之后的赛程信息生成都依赖于你填写的数据！\n\
 \n\
-int main(int argc, char *argv[]) {\n\
-    std::cout << "这是一段代码块" << std::endl;\n\
-}\n\
-```\n\
-#### katex公式\n\
-你可以使用katex语法来编写公式：\n\
-$$\n\sum_{i=1}^n a_i=0$$\n\
-#### mermaid流程图\n\
-你可以使用特定的语法编写漂亮的流程图：\n\
-```mermaid\n\
-graph LR\n\
-A --- B\n\
-B-->C[fa:fa-ban forbidden]\n\
-B-->D(fa:fa-spinner);\n\
-```\n\
-\n\
-#### Todo List\n\
-你可以插入一条todo项：\n\
-- [ ] Todo 1\n\
-- [x] Todo 2\n\
+在比赛过程中，`比赛汇总`和`分数汇总`会实时显示现在所有团队的比赛情况和你的团队的得分情况\n\
+而`奖项信息`会在比赛完成之后展示主办方上传的奖状图片，并喷出彩纸，为你庆祝\n\
+## 志愿者 A（赛场计分员）\n\
+登录之后，在右上角菜单打开`计分工具`\n\
+确认好比赛轮次和会场编号之后，输入主办方提供的会场令牌进入计分工具\n\
+计分过程的每一步所需要按下的按钮都会用`绿色实心`的格式标识，\n\
+计分工具整体看上去还是挺通俗易懂的，在熟悉比赛规则的情况下完成计分应该完全没有问题\n\
+## 志愿者 B（赛程计时员）\n\
+登录之后，在右上角菜单打开`赛程秒表`\n\
+`赛程秒表`是由另一位同学提供的古老工具，相对于其它工具较为简陋，但功能十分完善\n\
+页面正下方的按钮可以选择比赛环节，点击按钮后秒表会自动启动计时\n\
+志愿者也可以在右侧选择手动设置计时，或者启动`下一个环节`的计时\n\
 ')
 </script>
 
