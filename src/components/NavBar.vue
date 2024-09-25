@@ -57,6 +57,7 @@ onMounted(async () => {
         <el-dropdown-item @click="jump('/timer')">赛程秒表</el-dropdown-item>
         <el-dropdown-item @click="jump('/volunteer-tool')">计分工具</el-dropdown-item>
         <el-dropdown-item @click="jump('/team-center')">团队空间</el-dropdown-item>
+        <el-dropdown-item @click="jump('/admin-dashboard')">管理员仪表盘</el-dropdown-item>
         <el-dropdown-item @click="jump('/user-doc')">使用手册</el-dropdown-item>
         <el-dropdown-item @click="onLogout" divided>登出</el-dropdown-item>
       </template>

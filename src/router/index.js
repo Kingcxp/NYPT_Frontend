@@ -7,6 +7,7 @@ import TeamCenterView from '@/views/TeamCenterView.vue'
 import VolunteerToolView from '@/views/VolunteerToolView.vue'
 import TimerView from '@/views/TimerView.vue'
 import DocView from '@/views/DocView.vue'
+import AdminDashboardView from '@/views/AdminDashboardView.vue'
 
 
 const router = createRouter({
@@ -64,7 +65,16 @@ const router = createRouter({
         requireAuth: false,
       },
       component: DocView
-    }
+    },
+    {
+      path: '/admin-dashboard',
+      name: 'admin-dashboard',
+      meta: {
+        requireAuth: true,
+        identity: 'Administrator',
+      },
+      component: AdminDashboardView
+    },
   ]
 })
 

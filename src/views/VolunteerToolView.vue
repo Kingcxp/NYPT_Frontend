@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, getCurrentInstance } from 'vue'
+import { ref } from 'vue'
 
 import NavBar from '@/components/NavBar.vue'
 import FootBar from '@/components/FootBar.vue'

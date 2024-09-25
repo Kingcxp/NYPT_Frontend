@@ -37,7 +37,8 @@ onMounted(async () => {
 
 <template>
   <h2 class="award-title" @click="showConfetti">🎉 恭喜！</h2>
-  <img class="award-image" :src="imageSource" alt="award" />
+  <img class="award-image" :src="imageSource" alt="award" v-if="imageSource !== ''" />
+  <p class="award-text" v-else>啊喔！奖状走丢啦！😅</p>
 </template>
 
 <style scoped>
@@ -50,5 +51,9 @@ onMounted(async () => {
 .award-image {
   max-height: 65vh;
   width: auto;
+}
+.award-text {
+  font-size: xx-large;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 </style>
