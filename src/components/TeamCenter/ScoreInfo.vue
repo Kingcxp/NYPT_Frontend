@@ -29,8 +29,8 @@ onMounted(async () => {
     maxRounds.value = response.data.rounds
     minRounds.value = response.data.offset
   })
-  await proxy.$http.get(`/auth/userdata/real_name`).then((response) => {
-    selfName = response.data.real_name
+  await proxy.$http.get(`/auth/userdata/name`).then((response) => {
+    selfName = response.data.name
   })
   if (maxRounds.value === 0) {
     ElMessage({

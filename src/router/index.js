@@ -3,7 +3,6 @@ import axios from "@/utils/AxiosInstance"
 import { ElMessage } from 'element-plus'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from "@/views/LoginView.vue"
-import RegisterView from '@/views/RegisterView.vue'
 import TeamCenterView from '@/views/TeamCenterView.vue'
 import VolunteerToolView from '@/views/VolunteerToolView.vue'
 import TimerView from '@/views/TimerView.vue'
@@ -32,20 +31,11 @@ const router = createRouter({
       component: LoginView
     },
     {
-      path: '/register',
-      name: 'register',
-      meta: {
-        requireAuth: false,
-        notAllowedWhenAuth: true,
-      },
-      component: RegisterView
-    },
-    {
       path: '/team-center',
       name: 'team-center',
       meta: {
         requireAuth: true,
-        identity: 'Team',
+        identity: 'Team|Administrator',
       },
       component: TeamCenterView
     },
@@ -54,7 +44,7 @@ const router = createRouter({
       name: 'volunteer-tool',
       meta: {
         requireAuth: true,
-        identity: 'VolunteerA',
+        identity: 'VolunteerA|Administrator',
       },
       component: VolunteerToolView
     },
@@ -63,7 +53,7 @@ const router = createRouter({
       name: 'timer',
       meta: {
         requireAuth: true,
-        identity: 'VolunteerB',
+        identity: 'VolunteerB|Administrator',
       },
       component: TimerView
     },
@@ -79,7 +69,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _from) => {
-  if ((to.meta.requireAuth === undefined || to.meta.requireAuth === false) && 
+  if ((to.meta.requireAuth === undefined || to.meta.requireAuth === false) &&
       (to.meta.notAllowedWhenAuth === undefined || to.meta.notAllowedWhenAuth === false)) {
     return
   }
@@ -120,7 +110,7 @@ router.beforeEach(async (to, _from) => {
       await axios.get(`/auth/userdata/identity`).then((response) => {
         identity = response.data.identity
       })
-      if (identity !== to.meta.identity) {
+      if (to.meta.identity.indexOf(identity) === -1) {
         ElMessage({
           showClose: true,
           message: '这个页面与你的身份不相符！',

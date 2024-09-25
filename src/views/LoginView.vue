@@ -78,12 +78,6 @@ const onLogin = async () => {
             <el-input v-model="form.passwd" placeholder="请输入密码" type="password" @keyup.enter="onLogin(formRef)"/>
           </el-form-item>
           <el-button type="primary" style="width: 100%; margin-top: 1.5vh;" @click="onLogin(formRef)">登录</el-button>
-          <el-container style="width: 100%; margin-top: 2vh;">
-            <label style="margin: auto; color: rgba(255, 255, 255, 0.8);">
-              没有账号？
-              <a href="/register" style="text-decoration: none; color: #409eff; text-shadow: 0 0 12px #409eff">注册</a>
-            </label>
-          </el-container>
         </el-form>
       </el-container>
     </el-main>
