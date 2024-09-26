@@ -99,9 +99,10 @@ router.beforeEach(async (to, _from) => {
       return
     }
     if (to.meta.requireAuth === true) {
+      console.log(error)
       ElMessage({
         showClose: true,
-        message: error.response.msg,
+        message: error.response.data.msg,
         center: true,
         type: 'error'
       })

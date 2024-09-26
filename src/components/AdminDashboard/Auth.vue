@@ -1,9 +1,257 @@
 <script setup>
+import { ref, onMounted, getCurrentInstance, reactive } from 'vue'
+import { Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+
+import Base64 from '@/utils/Base64'
+
+
+const { proxy } = getCurrentInstance()
+const base64 = new Base64()
+let selfID = 0
+
+const addUserDialogVisible = ref(false)
+
+const page = ref(1)
+const pageSize = ref(10)
+const userdata = ref([])
+const userTotal = ref(0)
+const searchRef = ref("")
+
+const userFormRef = ref(null)
+const userForm = reactive({
+  name: '',
+  identity: '',
+  token: '',
+  email: '',
+})
+
+const userEmailValidator = (_rule, value, callback) => {
+  if (value !== '') {
+    let isEmail = RegExp(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/).test(value)
+    if (!isEmail) {
+      callback(new Error('请输入正确的邮箱！'))
+    }
+  }
+  callback()
+}
+
+const rules = {
+  name: [{required: true, message: '未输入姓名！', trigger: 'blur'}],
+  token: [{required: true, message: '未输入密码！', trigger: 'blur'}],
+  email: [{required: true, validator: userEmailValidator, trigger: 'blur'}]
+}
+
+const messageWhenCatch = (error) => {
+  ElMessage({
+    showClose: true,
+    message: error.response.data.msg,
+    center: true,
+    type: 'error'
+  })
+}
+
+const showDialog = () => {
+  addUserDialogVisible.value = true
+  userForm.name = ''
+  userForm.identity = 'Team'
+  userForm.token = ''
+  userForm.email = ''
+}
+
+const removeUser = async (idx) => {
+  await proxy.$http.get(`/auth/manage/user/delete/${userdata.value[idx].user_id}`).then((_) => {
+    userdata.value.splice(idx, 1)
+    userTotal.value -= 1
+    ElMessage({
+      showClose: true,
+      message: '删除成功！',
+      center: true,
+      type: 'success'
+    })
+  }).catch(messageWhenCatch)
+}
+
+const newUser = async () => {
+  userFormRef.value.validate(async (valid) => {
+    if (valid) {
+      await proxy.$http.post(`/auth/manage/user/create`, {
+        'name': userForm.name,
+        'identity': userForm.identity,
+        'token': userForm.token,
+        'email': userForm.email === '' ? null : userForm.email
+      }).then((_) => {
+        userTotal.value += 1
+        userdata.value.push({
+          'name': userForm.name,
+          'identity': userForm.identity,
+          'token': userForm.token,
+          'email': userForm.email === '' ? '未提供邮箱' : userForm.email
+        })
+        addUserDialogVisible.value = false
+        ElMessage({
+          showClose: true,
+          message: '添加成功！',
+          center: true,
+          type: 'success'
+        })
+      }).catch(messageWhenCatch)
+    }
+  })
+}
+
+const getPage = async () => {
+  if (selfID === 0) {
+    return
+  }
+  await proxy.$http.get(`/auth/manage/user/getall/${page.value}/${pageSize.value}`).then((response) => {
+    userdata.value = response.data.users.filter((user) => user.user_id !== selfID)
+  }).catch(messageWhenCatch)
+}
+
+const handlePageChange = async (pg) => {
+  if (pg === undefined) {
+    pg = 1
+  }
+  page.value = pg
+  await getPage()
+}
+
+onMounted(async () => {
+  await proxy.$http.get(`/auth/id`).then(async (response) => {
+    selfID = response.data.user_id
+  }).catch(messageWhenCatch)
+  await proxy.$http.get(`/auth/manage/user/total`).then((response) => {
+    userTotal.value = response.data.total
+  })
+  await getPage()
+})
 </script>
 
 <template>
+  <label class="admin-auth-title">全部用户信息</label>
+  <el-container class="admin-auth-table-container">
+    <el-table class="admin-auth-table" :data="userdata" stripe border>
+      <el-table-column fixed prop="name" label="用户名" width="120px"></el-table-column>
+      <el-table-column prop="email" label="邮箱" width="200px"></el-table-column>
+      <el-table-column prop="identity" label="身份类型" width="160px"></el-table-column>
+      <el-table-column prop="token" label="登录令牌" width="240px">
+        <template #default="scope">
+          <el-container>
+            <span>{{ userdata[scope.$index].view_token ? base64.decode(userdata[scope.$index].token) : userdata[scope.$index].token }}</span>
+            <el-icon
+              class="admin-auth-view-icon"
+              @click="userdata[scope.$index].view_token = !userdata[scope.$index].view_token"
+            >
+              <View class="admin-auth-view-icon-detail" v-if="!userdata[scope.$index].view_token" />
+              <Hide class="admin-auth-view-icon-detail" v-else />
+            </el-icon>
+          </el-container>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="删除" width="72px">
+        <template #default="scope">
+          <el-button style="height: 25px; width: 25px;" type="danger" :icon="Delete" circle @click="removeUser(scope.$index)" />
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-button class="admin-auth-add" @click="showDialog">
+      <el-icon class="admin-auth-icon"><Plus /></el-icon>
+      添加用户……
+    </el-button>
+    <el-pagination
+      class="admin-auth-pagination"
+      layout="prev, pager, next, jumper"
+      :total="userTotal"
+      @current-change="handlePageChange()"
+      background
+    />
+  </el-container>
 
+  <el-dialog v-model="addUserDialogVisible" title="新建用户">
+    <el-form ref="userFormRef" :model="userForm" :rules="rules" label-position="left" label-width="100px">
+      <el-form-item class="admin-auth-form-item" label="姓名" prop="name" @keyup.enter="newUser">
+        <el-input v-model="userForm.name" placeholder="请输入姓名" clearable/>
+      </el-form-item>
+      <el-form-item class="admin-auth-form-item" label="密码" prop="token" @keyup.enter="newUser">
+        <el-input v-model="userForm.token" placeholder="请输入密码" clearable/>
+      </el-form-item>
+      <el-form-item class="admin-auth-form-item" label="身份" prop="identity">
+        <el-radio-group v-model="userForm.identity">
+          <el-radio-button value="Admin">管理员</el-radio-button>
+          <el-radio-button value="Team">比赛队伍</el-radio-button>
+          <el-radio-button value="VolunteerA">志愿者 A 类</el-radio-button>
+          <el-radio-button value="VolunteerB">志愿者 B 类</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item class="admin-auth-form-item" label="邮箱" prop="email" @keyup.enter="newUser">
+        <el-input v-model="userForm.email" placeholder="请输入邮箱，若邮箱不为空则会自动发邮件给用户告知账号密码" clearable/>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="addUserDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="newUser">确定</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
+.admin-auth-title {
+  color: white;
+  font-size: xx-large;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  margin-top: 3vh;
+  margin-bottom: 2vh;
+  text-align: center;
+}
+.admin-auth-table {
+  width: fit-content;
+  max-width: 70vw;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+.admin-auth-view-icon {
+  height: min-content;
+  width: min-content;
+  cursor: pointer;
+  margin: auto;
+  margin-right: 0;
+}
+.admin-auth-view-icon-detail {
+  width: 20px;
+  height: auto;
+}
+.admin-auth-add {
+  width: 100%;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.25);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+  margin: 0 auto;
+}
+.admin-auth-add:hover {
+  text-shadow: 0 0 2px rgba(64, 158, 255, 0.25);
+  filter: drop-shadow(0 0 2px rgba(64, 158, 255, 0.25));
+}
+.admin-auth-icon {
+  margin-right: 12px;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+}
+.admin-auth-form-item {
+  margin-left: 5vw;
+  margin-right: 5vw;
+}
+.admin-auth-table-container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: auto
+}
+.admin-auth-pagination {
+  justify-content: center;
+  vertical-align: middle;
+  height: 64px;
+  width: 100%;
+  border: 1px solid #666666;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+}
 </style>
