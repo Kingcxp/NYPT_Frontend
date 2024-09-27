@@ -14,9 +14,10 @@ const addUserDialogVisible = ref(false)
 
 const page = ref(1)
 const pageSize = ref(10)
-const userdata = ref([])
+const userData = ref([])
 const userTotal = ref(0)
 const searchRef = ref("")
+const searchData = ref([])
 
 const userFormRef = ref(null)
 const userForm = reactive({
@@ -59,9 +60,57 @@ const showDialog = () => {
   userForm.email = ''
 }
 
+const searchUser = async () => {
+  if (searchRef.value === '') {
+    ElMessage({
+      showClose: true,
+      message: '搜索内容不可以为空！',
+      center: true,
+      type: 'error'
+    })
+    return
+  }
+  searchData.value = []
+  await proxy.$http.get(`/auth/manage/user/search/${searchRef.value}`).then((response) => {
+    searchData.value.push(response.data)
+  }).catch(messageWhenCatch)
+}
+
 const removeUser = async (idx) => {
-  await proxy.$http.get(`/auth/manage/user/delete/${userdata.value[idx].user_id}`).then((_) => {
-    userdata.value.splice(idx, 1)
+  if (userData.value[idx].user_id === selfID) {
+    ElMessage({
+      showClose: true,
+      message: '不可以删除自己！',
+      center: true,
+      type: 'error'
+    })
+    return
+  }
+  await proxy.$http.get(`/auth/manage/user/delete/${userData.value[idx].user_id}`).then((_) => {
+    userData.value.splice(idx, 1)
+    userTotal.value -= 1
+    ElMessage({
+      showClose: true,
+      message: '删除成功！',
+      center: true,
+      type: 'success'
+    })
+  }).catch(messageWhenCatch)
+}
+
+const removeSearchUser = async (idx) => {
+  if (searchData.value[idx].user_id === selfID) {
+    ElMessage({
+      showClose: true,
+      message: '不可以删除自己！',
+      center: true,
+      type: 'error'
+    })
+    return
+  }
+  await proxy.$http.get(`/auth/manage/user/delete/${searchData.value[idx].user_id}`).then((_) => {
+    searchData.value = []
+    userData.value = userData.value.filter((user) => user.user_id !== searchData.value[idx].user_id)
     userTotal.value -= 1
     ElMessage({
       showClose: true,
@@ -82,7 +131,7 @@ const newUser = async () => {
         'email': userForm.email === '' ? null : userForm.email
       }).then((_) => {
         userTotal.value += 1
-        userdata.value.push({
+        userData.value.push({
           'name': userForm.name,
           'identity': userForm.identity,
           'token': userForm.token,
@@ -105,7 +154,7 @@ const getPage = async () => {
     return
   }
   await proxy.$http.get(`/auth/manage/user/getall/${page.value}/${pageSize.value}`).then((response) => {
-    userdata.value = response.data.users.filter((user) => user.user_id !== selfID)
+    userData.value = response.data.users
   }).catch(messageWhenCatch)
 }
 
@@ -131,19 +180,20 @@ onMounted(async () => {
 <template>
   <label class="admin-auth-title">全部用户信息</label>
   <el-container class="admin-auth-table-container">
-    <el-table class="admin-auth-table" :data="userdata" stripe border>
+    <el-table class="admin-auth-table" :data="userData" stripe border>
+      <el-table-column fixed prop="user_id" label="用户 ID" width="80px"></el-table-column>
       <el-table-column fixed prop="name" label="用户名" width="120px"></el-table-column>
       <el-table-column prop="email" label="邮箱" width="200px"></el-table-column>
       <el-table-column prop="identity" label="身份类型" width="160px"></el-table-column>
       <el-table-column prop="token" label="登录令牌" width="240px">
         <template #default="scope">
           <el-container>
-            <span>{{ userdata[scope.$index].view_token ? base64.decode(userdata[scope.$index].token) : userdata[scope.$index].token }}</span>
+            <span>{{ userData[scope.$index].view_token ? base64.decode(userData[scope.$index].token) : userData[scope.$index].token }}</span>
             <el-icon
               class="admin-auth-view-icon"
-              @click="userdata[scope.$index].view_token = !userdata[scope.$index].view_token"
+              @click="userData[scope.$index].view_token = !userData[scope.$index].view_token"
             >
-              <View class="admin-auth-view-icon-detail" v-if="!userdata[scope.$index].view_token" />
+              <View class="admin-auth-view-icon-detail" v-if="!userData[scope.$index].view_token" />
               <Hide class="admin-auth-view-icon-detail" v-else />
             </el-icon>
           </el-container>
@@ -166,6 +216,38 @@ onMounted(async () => {
       @current-change="handlePageChange()"
       background
     />
+  </el-container>
+  <label class="admin-auth-title">查询用户</label>
+  <el-container class="admin-auth-table-container">
+    <el-container style="margin-bottom: 32px;">
+      <el-input class="admin-auth-search" v-model="searchRef" placeholder="请输入用户名" clearable @keyup.enter="searchUser" />
+      <el-button class="admin-auth-search-button" @click="searchUser" type="primary">查询</el-button>
+    </el-container>
+    <el-table class="admin-auth-table" :data="searchData" stripe border>
+      <el-table-column fixed prop="user_id" label="用户 ID" width="80px"></el-table-column>
+      <el-table-column fixed prop="name" label="用户名" width="120px"></el-table-column>
+      <el-table-column prop="email" label="邮箱" width="200px"></el-table-column>
+      <el-table-column prop="identity" label="身份类型" width="160px"></el-table-column>
+      <el-table-column prop="token" label="登录令牌" width="240px">
+        <template #default="scope">
+          <el-container>
+            <span>{{ searchData[scope.$index].view_token ? base64.decode(searchData[scope.$index].token) : searchData[scope.$index].token }}</span>
+            <el-icon
+              class="admin-auth-view-icon"
+              @click="searchData[scope.$index].view_token = !searchData[scope.$index].view_token"
+            >
+              <View class="admin-auth-view-icon-detail" v-if="!searchData[scope.$index].view_token" />
+              <Hide class="admin-auth-view-icon-detail" v-else />
+            </el-icon>
+          </el-container>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="删除" width="72px">
+        <template #default="scope">
+          <el-button style="height: 25px; width: 25px;" type="danger" :icon="Delete" circle @click="removeSearchUser(scope.$index)" />
+        </template>
+      </el-table-column>
+    </el-table>
   </el-container>
 
   <el-dialog v-model="addUserDialogVisible" title="新建用户">
@@ -243,6 +325,7 @@ onMounted(async () => {
 .admin-auth-table-container {
   display: flex;
   flex-direction: column;
+  flex: none;
   height: auto;
   width: auto
 }
@@ -253,5 +336,14 @@ onMounted(async () => {
   width: 100%;
   border: 1px solid #666666;
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+}
+.admin-auth-search {
+  width: calc(90% - 20px);
+  margin-right: 20px;
+}
+.admin-auth-search-button {
+  width: 10%;
+  color: #000;
+  font-size: large;
 }
 </style>
