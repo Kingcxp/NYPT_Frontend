@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, getCurrentInstance, reactive } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -11,6 +11,7 @@ const base64 = new Base64()
 let selfID = 0
 
 const addUserDialogVisible = ref(false)
+const addMultiUserDialogVisible = ref(false)
 
 const page = ref(1)
 const pageSize = ref(10)
@@ -26,6 +27,13 @@ const userForm = reactive({
   token: '',
   email: '',
 })
+const multiUserFormRef = ref(null)
+const multiUserForm = reactive({
+  begin: 0,
+  end: 0,
+  identity: '',
+  length: 8,
+})
 
 const userEmailValidator = (_rule, value, callback) => {
   if (value !== '') {
@@ -36,11 +44,24 @@ const userEmailValidator = (_rule, value, callback) => {
   }
   callback()
 }
+const notNullValidator = (_rule, value, callback) => {
+  if (value !== undefined && value !== NaN && value !== null) {
+    callback();
+  }
+  callback(new Error('不可以为空！'))
+}
 
-const rules = {
+const userRules = {
   name: [{required: true, message: '未输入姓名！', trigger: 'blur'}],
   token: [{required: true, message: '未输入密码！', trigger: 'blur'}],
+  identity: [{required: true, message: '未确定身份！', trigger: 'blur'}],
   email: [{required: true, validator: userEmailValidator, trigger: 'blur'}]
+}
+const multiUserRules = {
+  begin: [{required: true, validator: notNullValidator, trigger: 'blur'}],
+  end: [{required: true, validator: notNullValidator, trigger: 'blur'}],
+  identity: [{required: true, message: '未确定身份！', trigger: 'blur'}],
+  length: [{required: true, validator: notNullValidator, trigger: 'blur'}]
 }
 
 const messageWhenCatch = (error) => {
@@ -52,12 +73,20 @@ const messageWhenCatch = (error) => {
   })
 }
 
-const showDialog = () => {
+const showCreateDialog = () => {
   addUserDialogVisible.value = true
   userForm.name = ''
   userForm.identity = 'Team'
   userForm.token = ''
   userForm.email = ''
+}
+
+const showMultiCreateDialog = () => {
+  addMultiUserDialogVisible.value = true
+  multiUserForm.begin = 1
+  multiUserForm.end = 100
+  multiUserForm.identity = 'Team'
+  multiUserForm.length = 8
 }
 
 const searchUser = async () => {
@@ -129,15 +158,33 @@ const newUser = async () => {
         'identity': userForm.identity,
         'token': userForm.token,
         'email': userForm.email === '' ? null : userForm.email
-      }).then((_) => {
+      }).then(async (_) => {
         userTotal.value += 1
-        userData.value.push({
-          'name': userForm.name,
-          'identity': userForm.identity,
-          'token': userForm.token,
-          'email': userForm.email === '' ? '未提供邮箱' : userForm.email
-        })
+        await getPage()
         addUserDialogVisible.value = false
+        ElMessage({
+          showClose: true,
+          message: '添加成功！',
+          center: true,
+          type: 'success'
+        })
+      }).catch(messageWhenCatch)
+    }
+  })
+}
+
+const newMultiUser = async () => {
+  multiUserFormRef.value.validate(async (valid) => {
+    if (valid) {
+      await proxy.$http.post(`/auth/manage/user/createall`, {
+        'begin': multiUserForm.begin,
+        'end': multiUserForm.end,
+        'identity': multiUserForm.identity,
+        'length': multiUserForm.length
+      }).then(async (response) => {
+        userTotal.value = response.data.total
+        addMultiUserDialogVisible.value = false
+        await getPage()
         ElMessage({
           showClose: true,
           message: '添加成功！',
@@ -205,15 +252,19 @@ onMounted(async () => {
         </template>
       </el-table-column>
     </el-table>
-    <el-button class="admin-auth-add" @click="showDialog">
+    <el-button class="admin-auth-add" @click="showCreateDialog">
       <el-icon class="admin-auth-icon"><Plus /></el-icon>
-      添加用户……
+      添加用户…
+    </el-button>
+    <el-button class="admin-auth-add" @click="showMultiCreateDialog">
+      <el-icon class="admin-auth-icon"><Plus /></el-icon>
+      批量添加用户…
     </el-button>
     <el-pagination
       class="admin-auth-pagination"
       layout="prev, pager, next, jumper"
       :total="userTotal"
-      @current-change="handlePageChange()"
+      @current-change="handlePageChange"
       background
     />
   </el-container>
@@ -251,7 +302,7 @@ onMounted(async () => {
   </el-container>
 
   <el-dialog v-model="addUserDialogVisible" title="新建用户">
-    <el-form ref="userFormRef" :model="userForm" :rules="rules" label-position="left" label-width="100px">
+    <el-form ref="userFormRef" :model="userForm" :rules="userRules" label-position="left" label-width="100px">
       <el-form-item class="admin-auth-form-item" label="姓名" prop="name" @keyup.enter="newUser">
         <el-input v-model="userForm.name" placeholder="请输入姓名" clearable/>
       </el-form-item>
@@ -273,6 +324,31 @@ onMounted(async () => {
     <template #footer>
       <el-button @click="addUserDialogVisible = false">取消</el-button>
       <el-button type="primary" @click="newUser">确定</el-button>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="addMultiUserDialogVisible" title="新建用户">
+    <el-form ref="multiUserFormRef" :model="multiUserForm" :rules="multiUserRules" label-position="left" label-width="200px">
+      <el-form-item class="admin-auth-form-item" label="起始编号(1~999)" prop="begin">
+        <el-input-number v-model="multiUserForm.begin" :min="1" :max="999" />
+      </el-form-item>
+      <el-form-item class="admin-auth-form-item" label="终止编号(1~999)" prop="end">
+        <el-input-number v-model="multiUserForm.end" :min="multiUserForm.begin" :max="999" />
+      </el-form-item>
+      <el-form-item class="admin-auth-form-item" label="身份" prop="identity">
+        <el-radio-group v-model="multiUserForm.identity">
+          <el-radio-button value="Admin">管理员</el-radio-button>
+          <el-radio-button value="Team">比赛队伍</el-radio-button>
+          <el-radio-button value="VolunteerA">志愿者 A 类</el-radio-button>
+          <el-radio-button value="VolunteerB">志愿者 B 类</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item class="admin-auth-form-item" label="密码长度(4~20)" prop="length">
+        <el-input-number  v-model="multiUserForm.length" :min="4" :max="20" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="addMultiUserDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="newMultiUser">确定</el-button>
     </template>
   </el-dialog>
 </template>
