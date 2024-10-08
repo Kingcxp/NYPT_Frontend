@@ -252,11 +252,11 @@ onMounted(async () => {
         </template>
       </el-table-column>
     </el-table>
-    <el-button class="admin-auth-add" @click="showCreateDialog">
+    <el-button class="admin-auth-btn" @click="showCreateDialog">
       <el-icon class="admin-auth-icon"><Plus /></el-icon>
       添加用户…
     </el-button>
-    <el-button class="admin-auth-add" @click="showMultiCreateDialog">
+    <el-button class="admin-auth-btn" @click="showMultiCreateDialog">
       <el-icon class="admin-auth-icon"><Plus /></el-icon>
       批量添加用户…
     </el-button>
@@ -379,13 +379,13 @@ onMounted(async () => {
   width: 20px;
   height: auto;
 }
-.admin-auth-add {
+.admin-auth-btn {
   width: 100%;
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.25);
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
   margin: 0 auto;
 }
-.admin-auth-add:hover {
+.admin-auth-btn:hover {
   text-shadow: 0 0 2px rgba(64, 158, 255, 0.25);
   filter: drop-shadow(0 0 2px rgba(64, 158, 255, 0.25));
 }
@@ -403,7 +403,7 @@ onMounted(async () => {
   flex-direction: column;
   flex: none;
   height: auto;
-  width: auto
+  width: auto;
 }
 .admin-auth-pagination {
   justify-content: center;

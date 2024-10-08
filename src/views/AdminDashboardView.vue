@@ -4,9 +4,10 @@ import { ref } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import FootBar from '@/components/FootBar.vue'
 import Auth from '@/components/AdminDashboard/Auth.vue'
+import PTAssist from '@/components/AdminDashboard/PTAssist.vue'
 
 
-const active = ref(1)
+const active = ref(2)
 </script>
 
 <template>
@@ -14,7 +15,7 @@ const active = ref(1)
     <NavBar />
     <el-container class="admin-main-container">
       <el-aside class="admin-aside">
-        <el-menu default-active="1" :active="active" style="width: 15vw;">
+        <el-menu :default-active="String(active)" :active="active" style="width: 15vw;">
           <el-container class="admin-menu-title-container">
             <label class="admin-menu-title">功能列表</label>
           </el-container>
@@ -22,11 +23,18 @@ const active = ref(1)
             <el-icon><UserFilled /></el-icon>
             <span class="admin-menu-text">账号管理</span>
           </el-menu-item>
+          <el-menu-item class="admin-menu-item" index="2" @click="active = 2">
+            <el-icon><Management /></el-icon>
+            <span class="admin-menu-text">比赛管理</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-main class="admin-main">
         <el-container class="admin-content-container" v-if="active === 1">
           <Auth />
+        </el-container>
+        <el-container class="admin-content-container" v-else-if="active === 2">
+          <PTAssist />
         </el-container>
       </el-main>
     </el-container>
@@ -52,6 +60,7 @@ const active = ref(1)
 .admin-content-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 .admin-main {
   display: flex;
@@ -79,5 +88,5 @@ const active = ref(1)
   margin-right: 1.5vw;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
   font-size: large;
-}      
+}
 </style>
