@@ -25,7 +25,7 @@ const active = ref(2)
           </el-menu-item>
           <el-menu-item class="admin-menu-item" index="2" @click="active = 2">
             <el-icon><Management /></el-icon>
-            <span class="admin-menu-text">比赛管理</span>
+            <span class="admin-menu-text">配置管理</span>
           </el-menu-item>
         </el-menu>
       </el-aside>

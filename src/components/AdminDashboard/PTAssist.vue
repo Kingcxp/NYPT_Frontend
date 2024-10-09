@@ -10,7 +10,7 @@ const roomData = ref([])
 const messageWhenCatch = (error) => {
   ElMessage({
     showClose: true,
-    message: error.message,
+    message: error.response.data.msg,
     center: true,
     type: 'error'
   })
@@ -46,26 +46,31 @@ const generateCounterpartTable = async () => {
 }
 
 const getConfigTemplate = async () => {
-  await proxy.$http.get("/auth/manage/config/template").then((response) => {
-    const url = window.URL.createObjectURL(new Blob([response.data]))
-    const link = document.createElement("a")
-    link.href = url
-    link.setAttribute("download", "config_template.xlsx")
-    document.body.appendChild(link)
-    link.click();
-    document.body.removeChild(link)
-  }).catch(messageWhenCatch)
+  const link = document.createElement("a")
+  link.href = proxy.$http.defaults.baseURL + "/auth/manage/config/template"
+  document.body.appendChild(link)
+  link.click();
+  document.body.removeChild(link)
 }
 
 const downloadConfig = async () => {
-  await proxy.$http.get("/assist/manage/config/download").then((response) => {
-    const url = window.URL.createObjectURL(new Blob([response.data]))
-    const link = document.createElement("a")
-    link.href = url
-    link.setAttribute("download", "server_config.xlsx")
-    document.body.appendChild(link)
-    link.click();
-    document.body.removeChild(link)
+  const link = document.createElement("a")
+  link.href = proxy.$http.defaults.baseURL + "/assist/manage/config/download"
+  document.body.appendChild(link)
+  link.click();
+  document.body.removeChild(link)
+}
+
+const onUpload = async (param) => {
+  let formData = new FormData()
+  formData.append("file", param.file)
+  await proxy.$http.post("/assist/manage/config/upload", formData).then((response) => {
+    ElMessage({
+      showClose: true,
+      message: "配置文件上传成功！",
+      center: true,
+      type: "success"
+    })
   }).catch(messageWhenCatch)
 }
 
@@ -75,39 +80,44 @@ onMounted(async () => {
 </script>
 
 <template>
-  <label class="admin-assist-title">全部会场信息</label>
-  <el-container class="admin-assist-table-container">
-    <el-table class="admin-assist-table" :data="roomData" stripe border>
-      <el-table-column fixed prop="room_id" label="房间号" width="80px"></el-table-column>
-      <el-table-column prop="token" label="房间令牌" width="240px"></el-table-column>
-    </el-table>
-    <el-button class="admin-assist-btn" type="success" @click="refreshRooms">
-      <el-icon class="admin-assist-icon"><Refresh /></el-icon>
-      重新生成所有会场…
-    </el-button>
-  </el-container>
-  <label class="admin-assist-title">比赛控制台</label>
-  <el-container class="admin-assist-console-container">
-    <el-button class="admin-assist-console-btn" type="primary" @click="getConfigTemplate">
-      获取配置模板
-    </el-button>
-    <el-button class="admin-assist-console-btn" type="primary" @click="generateCounterpartTable">
-      生成对阵表
-    </el-button>
-    <el-button class="admin-assist-console-btn" type="primary" @click="downloadConfig">
-      下载配置文件
-    </el-button>
-  </el-container>
-  <el-container class="admin-assist-console-container">
-    <el-upload
-      class="admin-assist-console-upload"
-      :action="proxy.$http.defaults.baseURL + '/assist/manage/config/upload'"
-      :limit="1"
-      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      drag
-    >
-
-    </el-upload>
+  <el-container class="admin-assist-main-container">
+    <el-container class="admin-assist-container-left">
+      <label class="admin-assist-title">全部会场信息</label>
+      <el-container class="admin-assist-table-container">
+        <el-table class="admin-assist-table" :data="roomData" stripe border>
+          <el-table-column fixed prop="room_id" label="房间号" width="80px"></el-table-column>
+          <el-table-column prop="token" label="房间令牌" width="240px"></el-table-column>
+        </el-table>
+        <el-button class="admin-assist-btn" type="success" @click="refreshRooms">
+          <el-icon class="admin-assist-icon"><Refresh /></el-icon>
+          重新生成所有会场…
+        </el-button>
+      </el-container>
+    </el-container>
+    <el-container class="admin-assist-container-right">
+      <label class="admin-assist-title">配置控制台</label>
+      <el-container>
+        <el-button type="primary" @click="getConfigTemplate">
+          获取配置模板
+        </el-button>
+        <el-button type="primary" @click="generateCounterpartTable">
+          生成对阵表
+        </el-button>
+        <el-button type="primary" @click="downloadConfig">
+          下载配置文件
+        </el-button>
+        <el-upload
+          style="margin-left: 12px;"
+          :show-file-list="false"
+          :http-request="onUpload"
+          accept="application/vnd.ms-excel"
+        >
+          <template #trigger>
+            <el-button type="primary">上传配置文件</el-button>
+          </template>
+        </el-upload>
+      </el-container>
+    </el-container>
   </el-container>
 </template>
 
@@ -162,5 +172,26 @@ onMounted(async () => {
   flex: none;
   height: auto;
   width: min-content;
+}
+.admin-assist-main-container {
+  display: flex;
+  flex-direction: row;
+  width: 85vw;
+  height: 100%;
+}
+.admin-assist-container-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 36%;
+  margin-left: 14%;
+}
+.admin-assist-container-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 36%;
+  margin: auto 0;
+  margin-right: 14%;
 }
 </style>
