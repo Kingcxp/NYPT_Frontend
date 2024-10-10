@@ -34,6 +34,14 @@ const refreshRooms = async () => {
   }).catch(messageWhenCatch)
 }
 
+const exportRooms = async () => {
+  const link = document.createElement("a")
+  link.href = proxy.$http.defaults.baseURL + "/assist/manage/rooms/table"
+  document.body.appendChild(link)
+  link.click();
+  document.body.removeChild(link)
+}
+
 const generateCounterpartTable = async () => {
   await proxy.$http.get("/assist/manage/counterpart/generate").then((_) => {
     ElMessage({
@@ -91,6 +99,9 @@ onMounted(async () => {
         <el-button class="admin-assist-btn" type="success" @click="refreshRooms">
           <el-icon class="admin-assist-icon"><Refresh /></el-icon>
           重新生成所有会场…
+        </el-button>
+        <el-button class="admin-assist-btn" type="primary" @click="exportRooms">
+          导出会场令牌表…
         </el-button>
       </el-container>
     </el-container>
