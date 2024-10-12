@@ -275,8 +275,8 @@ const onNext = async () => {
     while (true) {
       let quit = false
       await proxy.$http.post(`/assist/upload`, {
-      'roomID': props.roomID,
-      'round': props.round,
+      'room_id': props.roomID,
+      'round_id': props.round,
       'token': props.token,
       'roomdata': props.roomdata
       }).then((response) => {

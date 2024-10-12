@@ -19,8 +19,8 @@ const form = reactive({
 
 const onEnter = async () => {
   await proxy.$http.post('/assist/roomdata', {
-    'roomID': form.roomID,
-    'round': form.round,
+    'room_id': form.roomID,
+    'round_id': form.round,
     'token': form.token,
   }).then((response) => {
     emits('roomdata', response.data.data)
@@ -87,7 +87,7 @@ onMounted(async () => {
           <el-form-item :span="6" class="enter-match-item" label="会场编号" prop="roomID">
             <el-select v-model="form.roomID" size="large">
               <el-option v-for="i in roomCount" :key="i+roomOffset-1" :label="i+roomOffset-1" :value="i+roomOffset-1"/>
-            </el-select>  
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="2" />

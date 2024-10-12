@@ -13,11 +13,10 @@ const isLeader = ref(false)
 const index = ref(0)
 const contactRef = ref(null)
 const contactForm = reactive({
-  contact: ''
+  school: '',
+  contact: '',
+  tel: '',
 })
-const contactRule = {
-  contact: [{required: true, message: '未输入联系人姓名！', trigger: 'blur'}],
-}
 const formRef = ref(null)
 const form = reactive({
   name: '',
@@ -147,6 +146,11 @@ const identityValidator = (_rule, value, callback) => {
   }
   callback()
 }
+const contactRule = {
+  school: [{required: true, message: '未输入学校！', trigger: 'blur'}],
+  contact: [{required: true, message: '未输入联系人姓名！', trigger: 'blur'}],
+  tel: [{required: true, validator: telValidator, trigger: 'blur'}]
+}
 const rules = {
   name: [{required: true, message: '未输入姓名！', trigger: 'blur'}],
   gender: [{required: true, message: '未输入性别！', trigger: 'blur'}],
@@ -235,7 +239,9 @@ const upload = () => {
       await proxy.$http.post(`/auth/teaminfo/save`, {
         'leaders': leaders.value,
         'members': members.value,
-        'contact': contactForm.contact
+        'school': contactForm.school,
+        'contact': contactForm.contact,
+        'tel': contactForm.tel
       }).then((_response) => {
         ElMessage({
           showClose: true,
@@ -257,7 +263,9 @@ const upload = () => {
 
 const download = async () => {
   await proxy.$http.get(`/auth/teaminfo/fetch`).then((response) => {
+    contactForm.school = response.data.school
     contactForm.contact = response.data.contact
+    contactForm.tel = response.data.tel
     leaders.value = response.data.leaders
     members.value = response.data.members
   }).catch((error) => {
@@ -329,10 +337,16 @@ onMounted(async () => {
     添加条目……
   </el-button>
   <label class="teamcenter-info-title">联系人信息</label>
-  <label class="teamcenter-info-tip">(请填写学校联系人信息)</label>
-  <el-form ref="contactRef" :model="contactForm" :rules="contactRule" label-position="left" label-width="120px">
-    <el-form-item style="width: 300px; margin: auto;" label="联系人姓名" prop="contact">
+  <label class="teamcenter-info-tip">(请填写学校及联系人信息)</label>
+  <el-form ref="contactRef" :model="contactForm" :rules="contactRule" label-position="left" label-width="160px">
+    <el-form-item style="width: 480px; margin: auto; margin-bottom: 24px;" label="队伍所属学校" prop="school">
+      <el-input v-model="contactForm.school" placeholder="请输入队伍所属学校" @keyup.enter="upload" clearable/>
+    </el-form-item>
+    <el-form-item style="width: 480px; margin: auto; margin-bottom: 24px;" label="联系人姓名" prop="contact">
       <el-input v-model="contactForm.contact" placeholder="请输入联系人姓名" @keyup.enter="upload" clearable/>
+    </el-form-item>
+    <el-form-item style="width: 480px; margin: auto; margin-bottom: 24px;" label="联系人电话" prop="tel">
+      <el-input v-model="contactForm.tel" placeholder="请输入联系人电话" @keyup.enter="upload" clearable/>
     </el-form-item>
   </el-form>
   <el-button class="teamcenter-info-save" type="primary" @click="upload">保存信息</el-button>
