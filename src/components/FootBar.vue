@@ -1,5 +1,5 @@
 <template>
-  <el-footer class="footer-container" style="height: 80px; width: 100vw; background-color: #6f106e;">
+  <el-footer class="footer-container">
     <a href="https://www.nju.edu.cn/">
       <img src="./icons/footer-logo.png" class="footer-img" style="filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))" />
     </a>
@@ -12,7 +12,7 @@
 
 <style scoped>
 .footer-container {
-  height: 60px;
+  height: 80px;
   width: 100vw;
   background-color: #6f106e;
   display: flex;

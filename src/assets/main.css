@@ -25,7 +25,7 @@ body {
   width: 18px !important;
 }
 
-.el-input, .el-select, .el-button {
+.el-input, .el-input-number, .el-select, .el-button {
   box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
 }
 
