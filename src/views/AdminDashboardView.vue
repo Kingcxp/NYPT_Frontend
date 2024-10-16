@@ -7,7 +7,7 @@ import Auth from '@/components/AdminDashboard/Auth.vue'
 import PTAssist from '@/components/AdminDashboard/PTAssist.vue'
 
 
-const active = ref(2)
+const active = ref(1)
 </script>
 
 <template>
