@@ -22,7 +22,9 @@ const getRooms = async () => {
   }).catch(messageWhenCatch)
 }
 
+const refreshRoomsLoading = ref(false)
 const refreshRooms = async () => {
+  refreshRoomsLoading.value = true
   await proxy.$http.get("/assist/manage/rooms/clear").then(async (_) => {
     ElMessage({
       showClose: true,
@@ -32,6 +34,7 @@ const refreshRooms = async () => {
     })
     await getRooms()
   }).catch(messageWhenCatch)
+  refreshRoomsLoading.value = false
 }
 
 const exportRooms = async () => {
@@ -42,7 +45,11 @@ const exportRooms = async () => {
   document.body.removeChild(link)
 }
 
+const isBtnDisabled = ref(false)
+const generateCounterpartLoading = ref(false)
 const generateCounterpartTable = async () => {
+  isBtnDisabled.value = true
+  generateCounterpartLoading.value = true
   await proxy.$http.get("/assist/manage/counterpart/generate").then((_) => {
     ElMessage({
       showClose: true,
@@ -51,6 +58,8 @@ const generateCounterpartTable = async () => {
       type: "success"
     })
   }).catch(messageWhenCatch)
+  generateCounterpartLoading.value = false
+  isBtnDisabled.value = false
 }
 
 const getConfigTemplate = async () => {
@@ -96,7 +105,7 @@ onMounted(async () => {
           <el-table-column fixed prop="room_id" label="房间号" width="80px"></el-table-column>
           <el-table-column prop="token" label="房间令牌" width="240px"></el-table-column>
         </el-table>
-        <el-button class="admin-assist-btn" type="success" @click="refreshRooms">
+        <el-button class="admin-assist-btn" type="success" v-loading="refreshRoomsLoading" @click="refreshRooms">
           <el-icon class="admin-assist-icon"><Refresh /></el-icon>
           重新生成所有会场…
         </el-button>
@@ -111,8 +120,8 @@ onMounted(async () => {
         <el-button type="primary" @click="getConfigTemplate">
           获取配置模板
         </el-button>
-        <el-button type="primary" @click="generateCounterpartTable">
-          生成对阵表
+        <el-button type="primary" v-loading="generateCounterpartLoading" @click="generateCounterpartTable" :disabled="isBtnDisabled">
+          生成对阵信息
         </el-button>
         <el-button type="primary" @click="downloadConfig">
           下载配置文件
