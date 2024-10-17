@@ -196,7 +196,7 @@ onMounted(async () => {
 .admin-assist-main-container {
   display: flex;
   flex-direction: row;
-  width: calc(85vw - 40px);
+  width: 100%;
   height: 100%;
 }
 .admin-assist-container-left {

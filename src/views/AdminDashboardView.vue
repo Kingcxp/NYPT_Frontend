@@ -8,7 +8,7 @@ import PTAssist from '@/components/AdminDashboard/PTAssist.vue'
 import RoomManager from '@/components/AdminDashboard/RoomManager.vue'
 
 
-const active = ref(1)
+const active = ref(3)
 </script>
 
 <template>
@@ -69,13 +69,16 @@ const active = ref(1)
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
+  width: 100%;
 }
 .admin-main {
   display: flex;
   height: calc(100vh - 140px);
   width: 85vw;
   align-items: center;
-  flex-direction: column
+  flex-direction: column;
+  padding: 0;
 }
 .admin-menu-title-container {
   display: flex;
