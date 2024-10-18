@@ -146,8 +146,8 @@ onMounted(async () => {
   color: white;
   font-size: xx-large;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
-  margin-top: 3vh;
-  margin-bottom: 2vh;
+  margin-top: 1.5vh;
+  margin-bottom: 1.5vh;
   text-align: center;
 }
 .admin-assist-table {

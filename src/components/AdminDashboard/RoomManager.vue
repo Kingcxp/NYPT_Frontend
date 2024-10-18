@@ -8,6 +8,7 @@ const { proxy } = getCurrentInstance()
 const membersInfo = ref([])
 const schoolSelected = ref(null)
 const teamSelected = ref(null)
+const recordSelected = ref(null)
 const roomdata = ref({})
 
 const messageWhenCatch = (err) => {
@@ -17,6 +18,20 @@ const messageWhenCatch = (err) => {
     center: true,
     type: 'error',
   })
+}
+
+const selectFirstTeamBySchool = () => {
+  if (schoolSelected.value === null) {
+    return
+  }
+  for (const item of roomdata.value.teamDataList) {
+    if (item.school === schoolSelected.value) {
+      teamSelected.value = item.name
+      membersInfo.value = item.playerDataList
+      recordSelected.value = item.recordDataList
+      break
+    }
+  }
 }
 
 const getRoomData = async () => {
@@ -29,13 +44,13 @@ const getRoomData = async () => {
       type: 'success',
     })
     schoolSelected.value = roomdata.value.schoolMap['1']
-    teamSelected.value = roomdata.value.teamDataList[0].name
+    selectFirstTeamBySchool()
   }).catch(messageWhenCatch)
 }
 
 const selectSchool = (name) => {
   schoolSelected.value = name
-  // TODO: 自动选择第一个队伍
+  selectFirstTeamBySchool()
 }
 
 const selectTeam = (item) => {
@@ -79,7 +94,8 @@ onMounted(getRoomData)
       </el-table>
     </el-container>
     <el-container class="room-manager-main">
-      <!-- TODO -->
+      <el-table class="room-manager-main-table" stripe border>
+      </el-table>
     </el-container>
   </el-container>
 </template>
@@ -118,13 +134,22 @@ onMounted(getRoomData)
   box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.3);
 }
 .room-manager-member-table {
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
   padding: 0;
   width: 16vw;
   height: 36vh;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
 }
 .room-manager-main {
   flex: none;
   width: 52vw;
+  height: 80vh;
+  margin-left: 16px;
+}
+.room-manager-main-table {
+  height: 100%;
+  width: 100%;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(202, 197, 197, 0.35);
+  box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.3);
 }
 </style>

@@ -79,6 +79,7 @@ const active = ref(3)
   align-items: center;
   flex-direction: column;
   padding: 0;
+  overflow: hidden;
 }
 .admin-menu-title-container {
   display: flex;
