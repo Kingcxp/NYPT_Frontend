@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Edit, Delete } from '@element-plus/icons-vue'
+import { Delete } from '@element-plus/icons-vue'
 
 
 const { proxy } = getCurrentInstance()
@@ -11,6 +11,11 @@ const schoolSelected = ref(null)
 const teamSelected = ref(null)
 const recordSelected = ref(null)
 const roomdata = ref({})
+
+const roomCount = ref(0)
+const roundCount = ref(0)
+const roomOffset = ref(0)
+const roundOffset = ref(0)
 
 const messageWhenCatch = (err) => {
   ElMessage({
@@ -45,6 +50,15 @@ const getRoomData = async () => {
     schoolSelected.value = roomdata.value.schoolMap['1']
     selectFirstTeamBySchool()
   }).catch(messageWhenCatch)
+  await proxy.$http.get(`/assist/total/room`).then((response) => {
+    roomCount.value = response.data.rooms
+    roomOffset.value = response.data.offset
+  })
+  await proxy.$http.get(`/assist/total/round`).then((response) => {
+    roundCount.value = response.data.rounds
+    roundOffset.value = response.data.offset
+  })
+  console.log(roundCount.value)
 }
 
 const selectSchool = (name) => {
@@ -63,14 +77,10 @@ const recordDialogVisible = ref(false)
 
 const memberFormRef = ref(null)
 const memberForm = reactive({
-  school: '',
-  team: '',
   name: '',
-  gender: ''
+  gender: '男'
 })
 const memberFormRules = {
-  school: [{ required: true, message: '请输入学校', trigger: 'blur' }],
-  team: [{ required: true, message: '请输入队伍名称', trigger: 'blur' }],
   name: [{ required: true, message: '请输入队员姓名', trigger: 'blur' }],
   gender: [{ required: true, message: '请选择队员性别', trigger: 'change' }]
 }
@@ -98,31 +108,96 @@ const recordFormRules = {
 }
 
 const removeMember = (index) => {
-  // TODO
+  membersInfo.value.splice(index, 1)
+  for (let item of roomdata.value.teamDataList) {
+    if (item.name === teamSelected.value) {
+      item.playerDataList = membersInfo.value
+      break
+    }
+  }
 }
 
 const newMember = () => {
-  // TODO
+  memberForm.name = ''
+  memberForm.gender = '男'
+  memberDialogVisible.value = true
 }
 
 const saveMember = () => {
-  // TODO
+  memberFormRef.value.validate((valid) => {
+    if (!valid) {
+      return
+    }
+    membersInfo.value.push({
+      name: memberForm.name,
+      gender: memberForm.gender
+    })
+    for (let item of roomdata.value.teamDataList) {
+      if (item.name === teamSelected.value) {
+        item.playerDataList = membersInfo.value
+        break
+      }
+    }
+    memberDialogVisible.value = false
+  })
 }
 
 const newRecord = () => {
-  // TODO
+  recordForm.round = 0
+  recordForm.phase = 1
+  recordForm.roomID = 0
+  recordForm.questionID = '1'
+  recordForm.masterID = 0
+  recordForm.role = 'R'
+  recordForm.score = 0.0
+  recordForm.weight = 0.0
+  recordDialogVisible.value = true
 }
 
 const removeRecord = (index) => {
-  // TODO
-}
-
-const loadRecord = (index) => {
-  // TODO
+  recordSelected.value.splice(index, 1)
+  for (let item of roomdata.value.teamDataList) {
+    if (item.name === teamSelected.value) {
+      item.recordDataList = recordSelected.value
+      break
+    }
+  }
 }
 
 const saveRecord = () => {
-  // TODO
+  recordFormRef.value.validate((valid) => {
+    if (!valid) {
+      return
+    }
+    recordSelected.value.push({
+      round: recordForm.round,
+      phase: recordForm.phase,
+      roomID: recordForm.roomID,
+      questionID: recordForm.questionID,
+      masterID: recordForm.masterID,
+      role: recordForm.role,
+      score: recordForm.score,
+      weight: recordForm.weight
+    })
+    for (let item of roomdata.value.teamDataList) {
+      if (item.name === teamSelected.value) {
+        item.recordDataList = recordSelected.value
+        break
+      }
+    }
+    recordDialogVisible.value = false
+  })
+}
+
+const saveData = async () => {
+  await proxy.$http.post("/assist/manage/rooms/data/upload", roomdata.value).then((response) => {
+    ElMessage({
+      showClose: true,
+      message: '数据保存成功！',
+      center: true,
+      type: 'success'
+    })
+  }).catch(messageWhenCatch)
 }
 
 onMounted(getRoomData)
@@ -176,27 +251,39 @@ onMounted(getRoomData)
         <el-table-column prop="role" label="角色" min-width="1"></el-table-column>
         <el-table-column prop="score" label="分数" min-width="1"></el-table-column>
         <el-table-column prop="weight" label="系数" min-width="1"></el-table-column>
-        <el-table-column label="编辑" min-width="1">
-          <template #default="scope">
-            <el-button type="primary" :icon="Edit" circle @click="loadRecord(scope.$index)" />
-          </template>
-        </el-table-column>
         <el-table-column label="删除" min-width="1">
           <template #default="scope">
             <el-button type="danger" :icon="Delete" circle @click="removeRecord(scope.$index)" />
           </template>
         </el-table-column>
       </el-table>
-      <el-button style="width: 100%;" class="room-manager-add" @click="newRecord()">
+      <el-button style="width: 100%; margin-bottom: 2vh;" class="room-manager-add" @click="newRecord()">
         <el-icon class="room-manager-icon"><Plus /></el-icon>
         添加记录……
+      </el-button>
+      <el-button style="width: 100%;" class="room-manager-add" @click="saveData()" type="success" plain>
+        保存数据
       </el-button>
     </el-container>
   </el-container>
 
   <el-dialog v-model="memberDialogVisible" title="添加选手">
-    <el-form ref="memberFormRef" :model="memberForm" :rules="memberFormRules" label-width="80px">
-
+    <el-form ref="memberFormRef" :model="memberForm" :rules="memberFormRules" label-width="80px" label-position="left">
+      <el-form-item class="room-manager-form-item" label="学校名" prop="school" @keyup.enter="saveMember()">
+        <el-input v-model="schoolSelected" placeholder="学校名" clearable disabled/>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="队伍名" prop="team" @keyup.enter="saveMember()">
+        <el-input v-model="teamSelected" placeholder="队伍名" clearable disabled/>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="姓名" prop="name" @keyup.enter="saveMember()">
+        <el-input v-model="memberForm.name" placeholder="请输入姓名" clearable/>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="性别" prop="gender">
+        <el-radio-group v-model="memberForm.gender">
+          <el-radio-button value="男">男</el-radio-button>
+          <el-radio-button value="女">女</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="memberDialogVisible = false">取消</el-button>
@@ -205,9 +292,72 @@ onMounted(getRoomData)
       </el-button>
     </template>
   </el-dialog>
-  <el-dialog v-model="recordDialogVisible" title="添加选手">
-    <el-form ref="recordFormRef" :model="recordForm" :rules="recordFormRules" label-width="80px">
-
+  <el-dialog v-model="recordDialogVisible" title="添加记录">
+    <el-form ref="recordFormRef" :model="recordForm" :rules="recordFormRules" label-width="120px" label-position="left">
+      <el-form-item class="room-manager-form-item" label="学校名" prop="school" @keyup.enter="saveMember()">
+        <el-input v-model="schoolSelected" placeholder="学校名" clearable disabled/>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="队伍名" prop="team" @keyup.enter="saveMember()">
+        <el-input v-model="teamSelected" placeholder="队伍名" clearable disabled/>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="轮次" prop="round">
+        <el-select v-model="recordForm.round">
+          <el-option
+            v-for="idx in roundCount + 1"
+            :key="idx - 2 + roundOffset"
+            :label="idx - 2 + roundOffset"
+            :value="idx - 2 + roundOffset"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="阶段" prop="phase">
+        <el-select v-model="recordForm.phase">
+          <el-option
+            v-for="idx in [1, 2, 3, 4]"
+            :key="idx" :label="idx" :value="idx"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="会场 ID" prop="roomID">
+        <el-select v-model="recordForm.roomID">
+          <el-option
+            v-for="idx in roomCount + 1"
+            :key="idx - 2 + roomOffset"
+            :label="idx - 2 + roomOffset"
+            :value="idx - 2 + roomOffset"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="题目 ID" prop="questionID">
+        <el-select v-model="recordForm.questionID">
+          <el-option
+            v-for="item in Object.keys(roomdata.questionMap ? roomdata.questionMap : {})"
+            :key="item" :label="item" :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="主控队员 ID" prop="masterID">
+        <el-select v-model="recordForm.masterID">
+          <el-option
+            v-for="item in Object.keys(membersInfo)"
+            :key="parseInt(item) + 1" :label="parseInt(item) + 1" :value="parseInt(item) + 1"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="角色" prop="role">
+        <el-select v-model="recordForm.role">
+          <el-option
+            v-for="item in ['R', 'O', 'V', 'X']"
+            :key="item" :label="item" :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="分数" prop="score">
+        <el-input-number v-model="recordForm.score" :min="-100" :max="100" :precision="1" :step="0.1" />
+      </el-form-item>
+      <el-form-item class="room-manager-form-item" label="权重" prop="weight">
+        <el-input-number v-model="recordForm.weight" :min="-100" :max="100" :precision="1" :step="0.1" />
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="recordDialogVisible = false">取消</el-button>
@@ -279,5 +429,9 @@ onMounted(getRoomData)
   margin-right: 12px;
   margin-bottom: 2px;
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+}
+.room-manager-form-item {
+  margin-left: 5vw;
+  margin-right: 5vw;
 }
 </style>
