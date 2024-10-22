@@ -295,12 +295,12 @@ onMounted(async () => {
     <el-table-column prop="profession" label="专业" width="145px" />
     <el-table-column prop="qq" label="QQ 号" width="118px"/>
     <el-table-column prop="email" label="邮箱" width="200px" />
-    <el-table-column class="teamcenter-table-button" fixed="right" label="编辑" width="72px">
+    <el-table-column fixed="right" label="编辑" width="72px">
       <template #default="scope">
         <el-button type="primary" :icon="Edit" circle @click="loadForm(false, scope.$index)" />
       </template>
     </el-table-column>
-    <el-table-column class="teamcenter-table-button" fixed="right" label="删除" width="72px">
+    <el-table-column fixed="right" label="删除" width="72px">
       <template #default="scope">
         <el-button type="danger" :icon="Delete" circle @click="removeForm(false, scope.$index)" />
       </template>
@@ -321,12 +321,12 @@ onMounted(async () => {
     <el-table-column prop="profession" label="专业" width="145px" />
     <el-table-column prop="qq" label="QQ 号" width="118px"/>
     <el-table-column prop="email" label="邮箱" width="200px" />
-    <el-table-column class="teamcenter-table-button" fixed="right" label="编辑" width="72px">
+    <el-table-column fixed="right" label="编辑" width="72px">
       <template #default="scope">
         <el-button type="primary" :icon="Edit" circle @click="loadForm(true, scope.$index)" />
       </template>
     </el-table-column>
-    <el-table-column class="teamcenter-table-button" fixed="right" label="删除" width="72px">
+    <el-table-column fixed="right" label="删除" width="72px">
       <template #default="scope">
         <el-button type="danger" :icon="Delete" circle @click="removeForm(true, scope.$index)" />
       </template>
