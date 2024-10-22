@@ -58,7 +58,6 @@ const getRoomData = async () => {
     roundCount.value = response.data.rounds
     roundOffset.value = response.data.offset
   })
-  console.log(roundCount.value)
 }
 
 const selectSchool = (name) => {
