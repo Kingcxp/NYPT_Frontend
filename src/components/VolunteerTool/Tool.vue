@@ -47,8 +47,8 @@ let usedQuestionList = []
 
 const nextRound = () => {
   // ! 加载队名
-  let len = props.roomdata.teamDataList
-  if (len == 3) {
+  let len = props.roomdata.teamDataList.length
+  if (len === 3) {
     teamSpecator.value = '无观摩方'
   } else {
     teamSpecator.value = props.roomdata.teamDataList[3].name
