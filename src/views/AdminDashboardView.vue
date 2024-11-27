@@ -8,7 +8,7 @@ import PTAssist from '@/components/AdminDashboard/PTAssist.vue'
 import RoomManager from '@/components/AdminDashboard/RoomManager.vue'
 
 
-const active = ref(3)
+const active = ref(1)
 </script>
 
 <template>
