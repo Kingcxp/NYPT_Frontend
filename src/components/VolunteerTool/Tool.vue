@@ -274,11 +274,11 @@ const onNext = async () => {
   if (phase.value > props.roomdata.teamDataList.length) {
     while (true) {
       let quit = false
-      await proxy.$http.post(`/assist/upload`, {
+      await proxy.$http.post(`/assist/roomdata/upload`, {
       'room_id': props.roomID,
       'round_id': props.round,
       'token': props.token,
-      'roomdata': props.roomdata
+      'new_data': props.roomdata
       }).then((response) => {
         ElMessage({
           showClose: true,
