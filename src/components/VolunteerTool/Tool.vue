@@ -496,7 +496,7 @@ onMounted(nextRound)
 .tool-question-list {
   flex-wrap: nowrap;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 140px);
   padding-left: 60px;
   padding-top: 20px;
 }

@@ -227,9 +227,9 @@ onMounted(getRoomData)
         </template>
       </el-scrollbar>
       <el-table class="room-manager-member-table rm-panel" :data="membersInfo" stripe border>
-        <el-table-column prop="name" label="姓名" min-width="2"></el-table-column>
-        <el-table-column prop="gender" label="性别" min-width="1"></el-table-column>
-        <el-table-column label="删除" min-width="1">
+        <el-table-column prop="name" label="姓名" min-width="4"></el-table-column>
+        <el-table-column prop="gender" label="性别" min-width="3"></el-table-column>
+        <el-table-column label="删除" min-width="3">
           <template #default="scope">
             <el-button type="danger" :icon="Delete" circle @click="removeMember(scope.$index)" />
           </template>
