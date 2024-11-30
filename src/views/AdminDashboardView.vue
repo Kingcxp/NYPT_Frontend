@@ -6,6 +6,7 @@ import FootBar from '@/components/FootBar.vue'
 import Auth from '@/components/AdminDashboard/Auth.vue'
 import PTAssist from '@/components/AdminDashboard/PTAssist.vue'
 import RoomManager from '@/components/AdminDashboard/RoomManager.vue'
+import Scoring from '@/components/AdminDashboard/Scoring.vue'
 
 
 const active = ref(1)
@@ -29,8 +30,12 @@ const active = ref(1)
             <span class="admin-menu-text">配置管理</span>
           </el-menu-item>
           <el-menu-item class="admin-menu-item" index="3" @click="active = 3">
-            <el-icon><Management /></el-icon>
+            <el-icon><Edit /></el-icon>
             <span class="admin-menu-text">比赛管理</span>
+          </el-menu-item>
+          <el-menu-item class="admin-menu-item" index="4" @click="active = 4">
+            <el-icon><MessageBox /></el-icon>
+            <span class="admin-menu-text">计分管理</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -43,6 +48,9 @@ const active = ref(1)
         </el-container>
         <el-container class="admin-content-container" v-else-if="active === 3">
           <RoomManager />
+        </el-container>
+        <el-container class="admin-content-container" v-else-if="active === 4">
+          <Scoring />
         </el-container>
       </el-main>
     </el-container>
