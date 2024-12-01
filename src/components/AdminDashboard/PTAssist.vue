@@ -37,7 +37,7 @@ const refreshRooms = async () => {
   refreshRoomsLoading.value = false
 }
 
-const exportRooms = async () => {
+const exportRooms = () => {
   const link = document.createElement("a")
   link.href = proxy.$http.defaults.baseURL + "/assist/manage/rooms/table"
   document.body.appendChild(link)
@@ -62,7 +62,7 @@ const generateCounterpartTable = async () => {
   isBtnDisabled.value = false
 }
 
-const getConfigTemplate = async () => {
+const getConfigTemplate = () => {
   const link = document.createElement("a")
   link.href = proxy.$http.defaults.baseURL + "/auth/manage/config/template"
   document.body.appendChild(link)
@@ -70,7 +70,7 @@ const getConfigTemplate = async () => {
   document.body.removeChild(link)
 }
 
-const downloadConfig = async () => {
+const downloadConfig = () => {
   const link = document.createElement("a")
   link.href = proxy.$http.defaults.baseURL + "/assist/manage/config/download"
   document.body.appendChild(link)

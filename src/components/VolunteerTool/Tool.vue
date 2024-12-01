@@ -272,10 +272,6 @@ const onNext = async () => {
   matchState.value = 'QUESTION'
   phase.value += 1
   if (phase.value > props.roomdata.teamDataList.length) {
-    // 清空 Disabled 状态
-    for (let key in Object.keys(props.roomdata.questionMap)) {
-      props.roomdata.questionMap[key] = props.roomdata.questionMap[key].replaceAll('[!Disabled]', '')
-    }
     while (true) {
       let quit = false
       await proxy.$http.post(`/assist/roomdata/upload`, {

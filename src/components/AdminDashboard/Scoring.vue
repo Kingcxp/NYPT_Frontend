@@ -1,6 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Delete, Finished } from '@element-plus/icons-vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
+import { Delete, Finished, Download } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+
+
+const { proxy } = getCurrentInstance()
 
 /*
 {
@@ -12,8 +16,42 @@ should be sorted.
 */
 const scoringData = ref([])
 
-onMounted(async () => {
+const errorWhenCatch = (error) => {
+  ElMessage({
+    center: true,
+    showClose: true,
+    message: error.response === undefined ? '网络错误！' : error.response.data.msg,
+    type: error.response === undefined ? 'warning' : 'error',
+  })
+}
 
+const removeFile = async (index) => {
+  await proxy.$http.post(`/assist/manage/scoring/remove`, scoringData.value[index]).then((response) => {
+    scoringData.value.splice(index, 1)
+  }).catch(errorWhenCatch)
+}
+
+const mergeFile = async (index) => {
+  await proxy.$http.post(`/assist/manage/scoring/merge`, scoringData.value[index]).then((response) => {
+    scoringData.value.splice(index, 1)
+  }).catch(errorWhenCatch)
+}
+
+const downloadFile = async (index) => {
+  await proxy.$http.post(`/assist/manage/scoring/download`, scoringData.value[index], {responseType: 'blob'}).then((response) => {
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(new Blob([response.data]))
+    document.body.appendChild(link)
+    link.setAttribute('download', `${scoringData.value[index].room_id}-${scoringData.value[index].round_id}-${scoringData.value[index].time_info}.json`)
+    link.click();
+    document.body.removeChild(link)
+  })
+}
+
+onMounted(async () => {
+  await proxy.$http.get(`/assist/manage/scoring/list`).then((response) => {
+    scoringData.value = response.data.files
+  }).catch(errorWhenCatch)
 })
 </script>
 
@@ -26,12 +64,17 @@ onMounted(async () => {
       <el-table-column prop="time_info" label="上传时间" width="280px"></el-table-column>
       <el-table-column fixed="right" label="丢弃" width="72px">
         <template #default="scope">
-          <el-button style="height: 25px; width: 25px;" type="danger" :icon="Delete" circle @click="removeFile(scope.$index)" />
+          <el-button style="height: 40px; width: 40px;" type="danger" :icon="Delete" circle @click="removeFile(scope.$index)" />
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="合并" width="72px">
         <template #default="scope">
-          <el-button style="height: 25px; width: 25px;" type="danger" :icon="Finished" circle @click="mergeFile(scope.$index)" />
+          <el-button style="height: 40px; width: 40px;" type="success" :icon="Finished" circle @click="mergeFile(scope.$index)" />
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="下载" width="72px">
+        <template #default="scope">
+          <el-button style="height: 40px; width: 40px;" type="primary" :icon="Download" circle @click="downloadFile(scope.$index)" />
         </template>
       </el-table-column>
     </el-table>

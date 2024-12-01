@@ -41,12 +41,6 @@ const selectFirstTeamBySchool = () => {
 const getRoomData = async () => {
   await proxy.$http.get('/assist/manage/rooms/data').then((response) => {
     roomdata.value = response.data
-    ElMessage({
-      showClose: true,
-      message: '获取房间信息成功！',
-      center: true,
-      type: 'success',
-    })
     schoolSelected.value = roomdata.value.schoolMap['1']
     selectFirstTeamBySchool()
   }).catch(messageWhenCatch)
