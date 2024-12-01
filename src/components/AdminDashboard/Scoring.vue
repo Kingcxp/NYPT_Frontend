@@ -6,7 +6,7 @@ import { Delete, Finished } from '@element-plus/icons-vue'
 {
   room_id: string,
   round_id: string,
-  time: string,
+  time_info: string,
 }
 should be sorted.
 */
@@ -23,7 +23,7 @@ onMounted(async () => {
     <el-table class="admin-scoring-table" :data="scoringData" stripe border>
       <el-table-column fixed prop="room_id" label="房间号" width="120px"></el-table-column>
       <el-table-column prop="round_id" label="轮次号" width="120px"></el-table-column>
-      <el-table-column prop="time" label="上传时间" width="280px"></el-table-column>
+      <el-table-column prop="time_info" label="上传时间" width="280px"></el-table-column>
       <el-table-column fixed="right" label="丢弃" width="72px">
         <template #default="scope">
           <el-button style="height: 25px; width: 25px;" type="danger" :icon="Delete" circle @click="removeFile(scope.$index)" />
