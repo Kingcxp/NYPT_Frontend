@@ -62,17 +62,17 @@ onMounted(async () => {
       <el-table-column fixed prop="room_id" label="房间号" width="120px"></el-table-column>
       <el-table-column prop="round_id" label="轮次号" width="120px"></el-table-column>
       <el-table-column prop="time_info" label="上传时间" width="280px"></el-table-column>
-      <el-table-column fixed="right" label="丢弃" width="72px">
+      <el-table-column fixed="right" label="丢弃" width="80px">
         <template #default="scope">
           <el-button style="height: 40px; width: 40px;" type="danger" :icon="Delete" circle @click="removeFile(scope.$index)" />
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="合并" width="72px">
+      <el-table-column fixed="right" label="合并" width="80px">
         <template #default="scope">
           <el-button style="height: 40px; width: 40px;" type="success" :icon="Finished" circle @click="mergeFile(scope.$index)" />
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="下载" width="72px">
+      <el-table-column fixed="right" label="下载" width="80px">
         <template #default="scope">
           <el-button style="height: 40px; width: 40px;" type="primary" :icon="Download" circle @click="downloadFile(scope.$index)" />
         </template>
