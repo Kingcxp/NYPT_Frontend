@@ -28,12 +28,24 @@ const errorWhenCatch = (error) => {
 const removeFile = async (index) => {
   await proxy.$http.post(`/assist/manage/scoring/remove`, scoringData.value[index]).then((response) => {
     scoringData.value.splice(index, 1)
+    ElMessage({
+      center: true,
+      showClose: true,
+      message: '删除成功！',
+      type: 'success',
+    })
   }).catch(errorWhenCatch)
 }
 
 const mergeFile = async (index) => {
   await proxy.$http.post(`/assist/manage/scoring/merge`, scoringData.value[index]).then((response) => {
     scoringData.value.splice(index, 1)
+    ElMessage({
+      center: true,
+      showClose: true,
+      message: '合并成功！',
+      type: 'success',
+    })
   }).catch(errorWhenCatch)
 }
 
