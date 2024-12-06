@@ -56,7 +56,7 @@ class CUPTRule extends RuleInterface {
       let tempQuestionIDLibList = minus(
         questionIDLibList,
         usedQuestionIDList,
-        (itemA, itemB) => { return itemA !== itemB }
+        (itemA, itemB) => { return itemA.toString() === itemB.toString() }
       )
       let repQRecordSet = repTeamRecordDataList.map(
         it => { return new Tuple(it.questionID, new Tuple(TeamType.REPORTER, it.role)) }
@@ -128,10 +128,10 @@ class CUPTRule extends RuleInterface {
       minus(
         questionIDList,
         repBanQuestionIDList,
-        (itemA, itemB) => { return itemA !== itemB }
+        (itemA, itemB) => { return itemA.toString() === itemB.toString() }
       ),
       oppBanQuestionIDList,
-      (itemA, itemB) => { return itemA !== itemB }
+      (itemA, itemB) => { return itemA.toString() === itemB.toString() }
     )
   }
 

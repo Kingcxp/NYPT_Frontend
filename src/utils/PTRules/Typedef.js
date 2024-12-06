@@ -52,9 +52,12 @@ class Tuple extends Array {
 
 const minus = (A, B, cond) => {
   return A.filter(itemA => {
-    return B.every(itemB => {
-      return cond(itemA, itemB)
-    })
+    for (let itemB of B) {
+      if (cond(itemA, itemB)) {
+        return false
+      }
+    }
+    return true
   })
 }
 

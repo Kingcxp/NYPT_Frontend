@@ -20,6 +20,7 @@ const onLogout = async () => {
       center: true,
       type: 'success'
     })
+    jump('/login')
   }).catch((_error) => {
     ElMessage({
       showClose: true,

@@ -8,6 +8,8 @@ const { proxy } = getCurrentInstance()
 const teamdata = ref([])
 const round = ref(1)
 const currentData = ref({})
+const maxRounds = ref(0)
+const minRounds = ref(0)
 
 const getNum = (str) => {
   let pattern = new RegExp('[0-9]+')
@@ -44,7 +46,7 @@ const refresh = async () => {
         continue
       }
       tempRecords[currentData.value.teamDataList[idx].name][currentData.value.teamDataList[idx].recordDataList[index].questionID.toString()]
-        += currentData.value.teamDataList[idx].recordDataList[index].role + currentData.value.teamDataList[idx].recordDataList[index].masterID
+        += currentData.value.teamDataList[idx].recordDataList[index].role + currentData.value.teamDataList[idx].recordDataList[index].phase
     }
   }
   for (let key in tempRecords) {
@@ -62,12 +64,17 @@ const refresh = async () => {
 }
 
 onMounted(async () => {
+  await proxy.$http.get(`/assist/total/round`).then((response) => {
+    round.value = response.data.offset
+    maxRounds.value = response.data.rounds
+    minRounds.value = response.data.offset
+  })
   await refresh()
 })
 </script>
 
 <template>
-  <label class="competition-info-title">比赛回顾</label>
+  <label class="competition-info-title">比赛回顾（前 <el-input-number v-model="round" :min="minRounds" :max="maxRounds" @change="refresh()"/> 轮）</label>
   <el-table class="competition-info-table" :data="teamdata" stripe border>
     <el-table-column fixed prop="teamname" label="队伍名" width="100px"></el-table-column>
     <el-table-column

@@ -20,6 +20,8 @@ let PTRules = {
   JSYPT:  new JSYPTRule(),
 }
 
+const data = ref({})
+
 const dialogVisible = ref(false)
 
 const selectedQuestion = ref('-1')
@@ -87,10 +89,12 @@ const nextRound = () => {
     Object.keys(props.roomdata.questionMap),
     props.matchType
   )
-  for (let key in Object.keys(props.roomdata.questionMap)) {
-    if (questionIDList.includes(parseInt(key)) && !props.roomdata.questionMap[key].endsWith('[!Disabled]')) {
-      props.roomdata.questionMap[key] += '[!Disabled]'
+  console.log(questionIDList)
+  for (let key of Object.keys(props.roomdata.questionMap)) {
+    if (questionIDList.includes(key.toString()) || props.roomdata.questionMap[key].endsWith('[!Disabled]')) {
+      continue
     }
+    props.roomdata.questionMap[key] += '[!Disabled]'
   }
 
   // ! 加载本场可用队员
@@ -321,7 +325,24 @@ const dialogConfirm = () => {
   proxy.$router.push('/')
 }
 
-onMounted(nextRound)
+onMounted(async () => {
+  await proxy.$http.get(`/assist/manage/rooms/data`).then((response) => {
+    data.value = response.data
+  }).catch((error) => {
+    ElMessage({
+      showClose: true,
+      message: error.response ? error.response.data.msg : "网络错误！",
+      center: true,
+      type: error.response ? 'error' : 'warning'
+    })
+  })
+  for (let i = 0; i < props.roomdata.teamDataList.length; ++i) {
+    props.roomdata.teamDataList[i].recordDataList = data.value.teamDataList.find(
+      element => element.name === props.roomdata.teamDataList[i].name
+    ).recordDataList
+  }
+  nextRound()
+})
 </script>
 
 <template>
