@@ -6,25 +6,25 @@ import { ElMessage } from 'element-plus'
 const { proxy } = getCurrentInstance()
 
 const teamdata = ref([])
-let selfName = ''
-let selfData = {}
+
+const getNum = (str) => {
+  let pattern = new RegExp('[0-9]+')
+  let num = str.match(pattern)
+  return num
+}
 
 onMounted(async () => {
-  await proxy.$http.get(`/auth/userdata/name`).then((response) => {
-    selfName = response.data.name
-  })
-  selfData['teamname'] = selfName
-  selfData['total'] = 0.0
   await proxy.$http.get(`/assist/manage/rooms/data`).then((response) => {
     for (let idx in response.data.teamDataList) {
-      if (selfName === response.data.teamDataList[idx].name) {
-        for (let index in response.data.teamDataList[idx].recordDataList) {
-          selfData['total'] +=
-              response.data.teamDataList[idx].recordDataList[index].score *
-              response.data.teamDataList[idx].recordDataList[index].weight
-        }
-        break
+      let selfData = {}
+      selfData['teamname'] = response.data.teamDataList[idx].name
+      selfData['total'] = 0.0
+      for (let index in response.data.teamDataList[idx].recordDataList) {
+        selfData['total'] +=
+            response.data.teamDataList[idx].recordDataList[index].score *
+            response.data.teamDataList[idx].recordDataList[index].weight
       }
+      teamdata.value.push(selfData)
     }
   }).catch((error) => {
     if (!withError) {
@@ -37,20 +37,25 @@ onMounted(async () => {
       })
     }
   })
-  teamdata.value.push(selfData)
+  teamdata.value.sort((lhs, rhs) => {
+    if (getNum(lhs.teamname) === '' || getNum(rhs.teamname) === '') {
+      return lhs.teamname < rhs.teamname ? -1 : 1
+    }
+    return getNum(lhs.teamname) - getNum(rhs.teamname)
+  })
 })
 </script>
 
 <template>
-  <label class="score-info-title">得分情况</label>
-  <el-table class="score-info-table" :data="teamdata" stripe border>
+  <label class="admin-score-info-title">得分情况</label>
+  <el-table class="admin-score-info-table" :data="teamdata" stripe border>
     <el-table-column fixed prop="teamname" label="队伍名" width="100px"></el-table-column>
     <el-table-column fixed="right" prop="total" label="总分" width="100px"></el-table-column>
   </el-table>
 </template>
 
 <style scoped>
-.score-info-title {
+.admin-score-info-title {
   color: white;
   font-size: xx-large;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
@@ -58,10 +63,11 @@ onMounted(async () => {
   margin-bottom: 3vh;
   text-align: center;
 }
-.score-info-table {
+.admin-score-info-table {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
   max-width: 80vw;
   max-height: 65vh;
+  width: fit-content;
 }
 </style>

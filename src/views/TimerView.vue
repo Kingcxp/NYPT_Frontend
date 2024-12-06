@@ -7,7 +7,7 @@ import FootBar from '@/components/FootBar.vue'
   <el-container class="timer-container">
     <NavBar />
     <el-main class="timer-main">
-      <iframe src="../../public/Timer/Timer.html" frameborder="0" style="height: 100%; width: 100%;"></iframe>
+      <iframe src="/Timer/Timer.html" frameborder="0" style="height: 100%; width: 100%;"></iframe>
     </el-main>
     <FootBar />
   </el-container>

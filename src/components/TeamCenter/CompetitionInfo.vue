@@ -7,11 +7,7 @@ const { proxy } = getCurrentInstance()
 
 const teamdata = ref([])
 const round = ref(1)
-const maxRounds = ref(0)
-const minRounds = ref(0)
-let maxRooms = 0
-let minRooms = 0
-const currentData = ref([])
+const currentData = ref({})
 
 const getNum = (str) => {
   let pattern = new RegExp('[0-9]+')
@@ -23,49 +19,32 @@ const refresh = async () => {
   teamdata.value = []
 
   let tempRecords = {}
-  for (let curRound = minRounds.value; curRound <= round.value; ++curRound) {
-    let withError = false
-    for (let i = minRooms; i <= maxRooms; ++i) {
-      await proxy.$http.post(`/assist/roomdata`, {
-        'room_id': i,
-        'round_id': curRound,
-        'token': 'just let me pass'
-      }).then((response) => {
-        if (i === minRooms) {
-          currentData.value = []
-        }
-        currentData.value.push(response.data.data)
-      }).catch((error) => {
-        if (!withError) {
-          withError = true
-          ElMessage({
-            showClose: true,
-            message: error.response ? error.response.data.msg : "网络错误！",
-            center: true,
-            type: error.response ? 'error' : 'warning'
-          })
-        }
-      })
-    }
-    for (let i in currentData.value) {
-      for (let idx in currentData.value[i].teamDataList) {
-        if (tempRecords[currentData.value[i].teamDataList[idx].name] === undefined) {
-          tempRecords[currentData.value[i].teamDataList[idx].name] = {}
-          for (let id in currentData.value[i].questionMap) {
-            tempRecords[currentData.value[i].teamDataList[idx].name][id] = ''
-          }
-        }
-        for (let index in currentData.value[i].teamDataList[idx].recordDataList) {
-          if (
-            currentData.value[i].teamDataList[idx].recordDataList[index].role === 'B' ||
-            currentData.value[i].teamDataList[idx].recordDataList[index].round > round.value
-          ) {
-            continue
-          }
-          tempRecords[currentData.value[i].teamDataList[idx].name][currentData.value[i].teamDataList[idx].recordDataList[index].questionID.toString()]
-            += currentData.value[i].teamDataList[idx].recordDataList[index].role
-        }
+  await proxy.$http.get(`/assist/manage/rooms/data`).then((response) => {
+    currentData.value = response.data
+  }).catch((error) => {
+    ElMessage({
+      showClose: true,
+      message: error.response ? error.response.data.msg : "网络错误！",
+      center: true,
+      type: error.response ? 'error' : 'warning'
+    })
+  })
+  for (let idx in currentData.value.teamDataList) {
+    if (tempRecords[currentData.value.teamDataList[idx].name] === undefined) {
+      tempRecords[currentData.value.teamDataList[idx].name] = {}
+      for (let id in currentData.value.questionMap) {
+        tempRecords[currentData.value.teamDataList[idx].name][id] = ''
       }
+    }
+    for (let index in currentData.value.teamDataList[idx].recordDataList) {
+      if (
+        currentData.value.teamDataList[idx].recordDataList[index].role === 'B' ||
+        currentData.value.teamDataList[idx].recordDataList[index].round > round.value
+      ) {
+        continue
+      }
+      tempRecords[currentData.value.teamDataList[idx].name][currentData.value.teamDataList[idx].recordDataList[index].questionID.toString()]
+        += currentData.value.teamDataList[idx].recordDataList[index].role + currentData.value.teamDataList[idx].recordDataList[index].masterID
     }
   }
   for (let key in tempRecords) {
@@ -83,36 +62,23 @@ const refresh = async () => {
 }
 
 onMounted(async () => {
-  await proxy.$http.get(`/assist/total/room`).then((response) => {
-    maxRooms = response.data.rooms
-    minRooms = response.data.offset
-  })
-  await proxy.$http.get(`/assist/total/round`).then((response) => {
-    round.value = response.data.offset
-    maxRounds.value = response.data.rounds
-    minRounds.value = response.data.offset
-  })
-  if (maxRounds.value === 0) {
-    ElMessage({
-      showClose: true,
-      message: '网络错误！',
-      center: true,
-      type: 'warning'
-    })
-    return
-  }
   await refresh()
 })
 </script>
 
 <template>
-  <label class="competition-info-title">比赛回顾（前 <el-input-number v-model="round" :min="minRounds" :max="maxRounds" @change="refresh()"/> 轮）</label>
+  <label class="competition-info-title">比赛回顾</label>
   <el-table class="competition-info-table" :data="teamdata" stripe border>
     <el-table-column fixed prop="teamname" label="队伍名" width="100px"></el-table-column>
     <el-table-column
-      v-for="[id, question] in Object.entries(currentData[0] ? currentData[0].questionMap : {})"
+      v-for="[id, question] in Object.entries(currentData.questionMap ? currentData.questionMap : {})"
       :prop="id" :label="(id < 10 ? ' 0' : ' ') + id + ' ' + question" width="200px"
-    ></el-table-column>
+    >
+      <template #default="scope">
+        <!-- TODO: fill in the table -->
+        {{ teamdata[scope.$index][id] }}
+      </template>
+    </el-table-column>
   </el-table>
 </template>
 
