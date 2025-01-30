@@ -404,6 +404,7 @@ onMounted(async () => {
   flex: none;
   height: auto;
   width: auto;
+  padding-bottom: 32px;
 }
 .admin-auth-pagination {
   justify-content: center;

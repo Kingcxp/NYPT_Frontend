@@ -95,7 +95,7 @@ const active = ref(1)
   align-items: center;
   flex-direction: column;
   padding: 0;
-  overflow: hidden;
+  overflow: scroll;
 }
 .admin-menu-title-container {
   display: flex;
