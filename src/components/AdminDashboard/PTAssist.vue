@@ -45,10 +45,26 @@ const exportRooms = () => {
   document.body.removeChild(link)
 }
 
-const isBtnDisabled = ref(false)
+const generateLotteryTableBtnDisabled = ref(false)
+const generateCounterpartTableBtnDisabled = ref(false)
+const generateLotteryCounterpartLoading = ref(false)
 const generateCounterpartLoading = ref(false)
+const generateLotteryCounterpartTable = async () => {
+  generateLotteryTableBtnDisabled.value = true
+  generateLotteryCounterpartLoading.value = true
+  await proxy.$http.get("/assist/manage/counterpart/generate_lottery").then((_) => {
+    ElMessage({
+      showClose: true,
+      message: "已生成抽奖号对阵表！",
+      center: true,
+      type: "success"
+    })
+  }).catch(messageWhenCatch)
+  generateLotteryCounterpartLoading.value = false
+  generateLotteryTableBtnDisabled.value = false
+}
 const generateCounterpartTable = async () => {
-  isBtnDisabled.value = true
+  generateCounterpartTableBtnDisabled.value = true
   generateCounterpartLoading.value = true
   await proxy.$http.get("/assist/manage/counterpart/generate").then((_) => {
     ElMessage({
@@ -59,7 +75,7 @@ const generateCounterpartTable = async () => {
     })
   }).catch(messageWhenCatch)
   generateCounterpartLoading.value = false
-  isBtnDisabled.value = false
+  generateCounterpartTableBtnDisabled.value = false
 }
 
 const getConfigTemplate = () => {
@@ -116,24 +132,26 @@ onMounted(async () => {
     </el-container>
     <el-container class="admin-assist-container-right">
       <label class="admin-assist-title">配置控制台</label>
-      <el-container>
-        <el-button type="primary" @click="getConfigTemplate">
+      <el-container style="flex-direction: column;">
+        <el-button type="primary" style="margin: 16px 0;" @click="getConfigTemplate">
           获取配置模板
         </el-button>
-        <el-button type="primary" v-loading="generateCounterpartLoading" @click="generateCounterpartTable" :disabled="isBtnDisabled">
+        <el-button type="primary" style="margin: 16px 0;" v-loading="generateLotteryCounterpartLoading" @click="generateLotteryCounterpartTable" :disabled="generateLotteryCounterpartTableBtnDisabled">
+          生成抽签对阵
+        </el-button>
+        <el-button type="primary" style="margin: 16px 0;" v-loading="generateCounterpartLoading" @click="generateCounterpartTable" :disabled="generateCounterpartTableBtnDisabled">
           生成对阵信息
         </el-button>
-        <el-button type="primary" @click="downloadConfig">
+        <el-button type="primary" style="margin: 16px 0;" @click="downloadConfig">
           下载配置文件
         </el-button>
         <el-upload
-          style="margin-left: 12px;"
           :show-file-list="false"
           :http-request="onUpload"
           accept="application/vnd.ms-excel"
         >
           <template #trigger>
-            <el-button type="primary">上传配置文件</el-button>
+            <el-button type="primary" style="margin: 16px 0;">上传配置文件</el-button>
           </template>
         </el-upload>
       </el-container>

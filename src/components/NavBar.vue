@@ -44,8 +44,8 @@ onMounted(async () => {
 
 <template>
   <el-header class="navbar">
-    <img src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(0 0 6px #FF25FD);" />
-    <img src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(0 0 2px #409eff); margin-left: 8px;"/>
+    <img class="navbar-img" @click="jump('/')" src="./icons/nju-logo.png" width="37px" height="37px" style="filter: drop-shadow(0 0 6px #FF25FD); cursor: pointer;" />
+    <img class="navbar-img" @click="jump('/')" src="./icons/name-bold.png" height="30px" width="auto" style="filter: drop-shadow(0 0 2px #409eff); margin-left: 8px;"/>
     <el-button @click="jump('/login')" class="navbar-btn" v-if="!userID">
       登录
     </el-button>
@@ -94,5 +94,8 @@ onMounted(async () => {
   cursor: pointer;
   color: #409eff;
   background-color: rgba(198, 226, 255, 0.3);
+}
+.navbar-img:hover {
+  cursor: pointer;
 }
 </style>
