@@ -67,9 +67,9 @@ const multiUserRules = {
 const messageWhenCatch = (error) => {
   ElMessage({
     showClose: true,
-    message: error.response.data.msg,
+    message: error.response === undefined ? '网络错误！' : error.response.data.msg,
     center: true,
-    type: 'error'
+    type: error.response === undefined ? 'warning' : 'error'
   })
 }
 

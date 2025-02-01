@@ -8,6 +8,7 @@ import VolunteerToolView from '@/views/VolunteerToolView.vue'
 import TimerView from '@/views/TimerView.vue'
 import DocView from '@/views/DocView.vue'
 import AdminDashboardView from '@/views/AdminDashboardView.vue'
+import RoundaboutView from '@/views/RoundaboutView.vue'
 
 
 const router = createRouter({
@@ -74,6 +75,15 @@ const router = createRouter({
         identity: 'Administrator',
       },
       component: AdminDashboardView
+    },
+    {
+      path: '/roundabout',
+      name: 'roundabout',
+      meta: {
+        requireAuth: true,
+        identity: 'Administrator'
+      },
+      component: RoundaboutView
     },
   ]
 })
