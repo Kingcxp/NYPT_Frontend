@@ -46,6 +46,8 @@ let roundPlayerRecordList = []
 let refusedQuestionList = []
 let usedQuestionList = []
 
+let thisPhaseRefusedList = []
+
 
 const nextRound = () => {
   // ! 加载队名
@@ -131,6 +133,7 @@ const onRefuse = () => {
     return
   }
   refusedQuestionList.push(parseInt(selectedQuestion.value))
+  thisPhaseRefusedList.push(selectedQuestion.value)
   props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
   selectedQuestion.value = '-1'
   ElMessage({
@@ -249,6 +252,15 @@ const onSave = () => {
     'weight': PTRules[props.rule].getRevScoreWeight()
   })
   matchState.value = 'NEXT'
+
+  thisPhaseRefusedList.forEach(question => {
+    props.roomdata.questionMap[question] = props.roomdata.questionMap[question].replaceAll('[!Disabled]', '')
+  })
+  let len = thisPhaseRefusedList.length
+  for (let i = 0; i < len; ++i) {
+    thisPhaseRefusedList.pop()
+  }
+
   ElMessage({
     showClose: true,
     message: '本场记录已经保存！',
@@ -283,7 +295,7 @@ const onNext = async () => {
       'round_id': props.round,
       'token': props.token,
       'new_data': props.roomdata
-      }).then((response) => {
+      }).then((_response) => {
         ElMessage({
           showClose: true,
           message: '数据已上传！',
@@ -291,7 +303,7 @@ const onNext = async () => {
           type: 'success'
         })
         quit = true
-      }).catch((error) => {
+      }).catch((_error) => {
         ElMessage({
           showClose: true,
           message: '啊哦！数据上传失败！重传中，请勿关闭页面！',

@@ -46,7 +46,7 @@ const refresh = async () => {
         continue
       }
       tempRecords[currentData.value.teamDataList[idx].name][currentData.value.teamDataList[idx].recordDataList[index].questionID.toString()]
-        += currentData.value.teamDataList[idx].recordDataList[index].role + currentData.value.teamDataList[idx].recordDataList[index].phase
+        += currentData.value.teamDataList[idx].recordDataList[index].role + currentData.value.teamDataList[idx].recordDataList[index].round
     }
   }
   for (let key in tempRecords) {
