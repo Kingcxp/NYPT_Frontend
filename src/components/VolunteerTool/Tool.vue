@@ -253,7 +253,7 @@ const onSave = () => {
   matchState.value = 'NEXT'
 
   // ! 清除所有 disabled
-  for (let question of props.roomdata.questionMap.keys()) {
+  for (let question of Object.keys(props.roomdata.questionMap)) {
     props.roomdata.questionMap[question] = props.roomdata.questionMap[question].replaceAll('[!Disabled]', '')
   }
 
