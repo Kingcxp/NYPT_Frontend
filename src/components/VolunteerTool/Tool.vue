@@ -21,6 +21,7 @@ let PTRules = {
 }
 
 const data = ref({})
+const roomdataRef = ref(null)
 
 const dialogVisible = ref(false)
 
@@ -46,22 +47,20 @@ let roundPlayerRecordList = []
 let refusedQuestionList = []
 let usedQuestionList = []
 
-// let thisPhaseRefusedList = []
-
 
 const nextRound = () => {
   // ! 加载队名
-  let len = props.roomdata.teamDataList.length
+  let len = roomdataRef.value.teamDataList.length
   if (len === 3) {
     teamSpecator.value = '无观摩方'
   } else {
-    teamSpecator.value = props.roomdata.teamDataList[3].name
+    teamSpecator.value = roomdataRef.value.teamDataList[3].name
   }
-  teamReport.value = props.roomdata.teamDataList[0].name
-  teamOppose.value = props.roomdata.teamDataList[1].name
-  teamReview.value = props.roomdata.teamDataList[2].name
+  teamReport.value = roomdataRef.value.teamDataList[0].name
+  teamOppose.value = roomdataRef.value.teamDataList[1].name
+  teamReview.value = roomdataRef.value.teamDataList[2].name
 
-  props.roomdata.teamDataList.push(props.roomdata.teamDataList.shift())
+  roomdataRef.value.teamDataList.push(roomdataRef.value.teamDataList.shift())
 
   // ! 读取记录
   let repTeamRecordDataList = props.roomdata.teamDataList.find(
@@ -91,11 +90,11 @@ const nextRound = () => {
     Object.keys(props.roomdata.questionMap),
     props.matchType
   )
-  for (let key of Object.keys(props.roomdata.questionMap)) {
-    if (questionIDList.includes(key.toString()) || props.roomdata.questionMap[key].endsWith('[!Disabled]')) {
+  for (let key of Object.keys(roomdataRef.value.questionMap)) {
+    if (questionIDList.includes(key.toString()) || roomdataRef.value.questionMap[key].endsWith('[!Disabled]')) {
       continue
     }
-    props.roomdata.questionMap[key] += '[!Disabled]'
+    roomdataRef.value.questionMap[key] += '[!Disabled]'
   }
 
   // ! 加载本场可用队员
@@ -132,8 +131,7 @@ const onRefuse = () => {
     return
   }
   refusedQuestionList.push(parseInt(selectedQuestion.value))
-  // thisPhaseRefusedList.push(selectedQuestion.value)
-  props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
+  roomdataRef.value.questionMap[selectedQuestion.value] += '[!Disabled]'
   selectedQuestion.value = '-1'
   ElMessage({
     showClose: true,
@@ -147,7 +145,7 @@ const onConfirm = () => {
     return
   }
   usedQuestionList.push(parseInt(selectedQuestion.value))
-  props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
+  roomdataRef.value.questionMap[selectedQuestion.value] += '[!Disabled]'
   matchState.value = 'SUBMIT'
   ElMessage({
     showClose: true,
@@ -169,7 +167,7 @@ const onSave = () => {
     })
     return
   }
-  let repTeamData = props.roomdata.teamDataList.find(
+  let repTeamData = roomdataRef.value.teamDataList.find(
     team => { return team.name === teamReport.value }
   )
   let repPlayerID = repTeamData.playerDataList.find(
@@ -179,7 +177,7 @@ const onSave = () => {
   for (let i = 0; i < judgers.value.length; i++) {
     repScores.push(judgers.value[i][0])
   }
-  let oppTeamData = props.roomdata.teamDataList.find(
+  let oppTeamData = roomdataRef.value.teamDataList.find(
     team => { return team.name === teamOppose.value }
   )
   let oppPlayerID = oppTeamData.playerDataList.find(
@@ -189,7 +187,7 @@ const onSave = () => {
   for (let i = 0; i < judgers.value.length; i++) {
     oppScores.push(judgers.value[i][1])
   }
-  let revTeamData = props.roomdata.teamDataList.find(
+  let revTeamData = roomdataRef.value.teamDataList.find(
     team => { return team.name === teamReview.value }
   )
   let revPlayerID = revTeamData.playerDataList.find(
@@ -253,17 +251,9 @@ const onSave = () => {
   matchState.value = 'NEXT'
 
   // ! 清除所有 disabled
-  for (let question of Object.keys(props.roomdata.questionMap)) {
-    props.roomdata.questionMap[question] = props.roomdata.questionMap[question].replaceAll('[!Disabled]', '')
+  for (let question of Object.keys(roomdataRef.value.questionMap)) {
+    roomdataRef.value.questionMap[question] = roomdataRef.value.questionMap[question].replaceAll('[!Disabled]', '')
   }
-
-  // thisPhaseRefusedList.forEach(question => {
-  //   props.roomdata.questionMap[question] = props.roomdata.questionMap[question].replaceAll('[!Disabled]', '')
-  // })
-  // let len = thisPhaseRefusedList.length
-  // for (let i = 0; i < len; ++i) {
-  //   thisPhaseRefusedList.pop()
-  // }
 
   ElMessage({
     showClose: true,
@@ -291,15 +281,15 @@ const onNext = async () => {
   selectedQuestion.value = '-1'
   matchState.value = 'QUESTION'
   phase.value += 1
-  if (phase.value > props.roomdata.teamDataList.length) {
+  if (phase.value > roomdataRef.value.teamDataList.length) {
     while (true) {
       let quit = false
       await proxy.$http.post(`/assist/roomdata/upload`, {
       'room_id': props.roomID,
       'round_id': props.round,
       'token': props.token,
-      'new_data': props.roomdata
-      }).then((_response) => {
+      'new_data': roomdataRef.value
+      }).then(() => {
         ElMessage({
           showClose: true,
           message: '数据已上传！',
@@ -307,7 +297,7 @@ const onNext = async () => {
           type: 'success'
         })
         quit = true
-      }).catch((_error) => {
+      }).catch(() => {
         ElMessage({
           showClose: true,
           message: '啊哦！数据上传失败！重传中，请勿关闭页面！',
@@ -342,6 +332,7 @@ const dialogConfirm = () => {
 }
 
 onMounted(async () => {
+  roomdataRef.value = props.roomdata
   await proxy.$http.get(`/assist/manage/rooms/data`).then((response) => {
     data.value = response.data
   }).catch((error) => {
@@ -352,9 +343,9 @@ onMounted(async () => {
       type: error.response ? 'error' : 'warning'
     })
   })
-  for (let i = 0; i < props.roomdata.teamDataList.length; ++i) {
-    props.roomdata.teamDataList[i].recordDataList = data.value.teamDataList.find(
-      element => element.name === props.roomdata.teamDataList[i].name
+  for (let i = 0; i < roomdataRef.value.teamDataList.length; ++i) {
+    roomdataRef.value.teamDataList[i].recordDataList = data.value.teamDataList.find(
+      element => element.name === roomdataRef.value.teamDataList[i].name
     ).recordDataList
   }
   nextRound()
@@ -368,6 +359,7 @@ onMounted(async () => {
         <el-radio
           class="tool-question"
           v-for="[id, question] in Object.entries(roomdata.questionMap)"
+          :key="id"
           :value="id" :disabled="question.endsWith('[!Disabled]') || matchState !== 'QUESTION'"
         >
           {{ (id < 10 ? ' 0' : ' ') + id + ' ' + question.replaceAll('[!Disabled]', '') }}
@@ -449,7 +441,7 @@ onMounted(async () => {
           <el-text class="control-panel-label interval-helper" style="line-height: 38px;">反：</el-text>
           <el-text class="control-panel-label" style="line-height: 38px;">评：</el-text>
         </el-container>
-        <el-container class="scoreboard-col" v-for="i in judgers.length">
+        <el-container class="scoreboard-col" v-for="i in judgers.length" :key="i">
           <el-input-number
             class="scoreboard-number interval-helper"
             :min="0" :max="10"

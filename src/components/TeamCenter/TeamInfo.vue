@@ -165,24 +165,24 @@ const rules = {
 const newForm = (notLeader) => {
   isLeader.value = !notLeader
   if (isLeader.value) {
-    if (leaders.value.length < 2 && leaders.value.length + members.value.length < 5) {
+    if (leaders.value.length < 2 && leaders.value.length + members.value.length < 6) {
       index.value = leaders.value.length
     } else {
       ElMessage({
         showClose: true,
-        message: leaders.value.length === 2 ? '领队数不能超过 2 人！' : '队伍总人数不能超过 5 人！',
+        message: leaders.value.length === 2 ? '领队数不能超过 2 人！' : '队伍总人数不能超过 6 人！',
         center: true,
         type: 'error'
       })
       return
     }
   } else {
-    if (leaders.value.length + members.value.length < 5) {
+    if (leaders.value.length + members.value.length < 6) {
       index.value = members.value.length
     } else {
       ElMessage({
         showClose: true,
-        message: '队伍总人数不能超过 5 人！',
+        message: '队伍总人数不能超过 6 人！',
         center: true,
         type: 'error'
       })
