@@ -82,7 +82,6 @@ onMounted(async () => {
       :prop="id" :label="(id < 10 ? ' 0' : ' ') + id + ' ' + question" width="200px"
     >
       <template #default="scope">
-        <!-- TODO: fill in the table -->
         {{ teamdata[scope.$index][id] }}
       </template>
     </el-table-column>

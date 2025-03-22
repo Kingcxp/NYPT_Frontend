@@ -46,7 +46,7 @@ let roundPlayerRecordList = []
 let refusedQuestionList = []
 let usedQuestionList = []
 
-let thisPhaseRefusedList = []
+// let thisPhaseRefusedList = []
 
 
 const nextRound = () => {
@@ -91,7 +91,6 @@ const nextRound = () => {
     Object.keys(props.roomdata.questionMap),
     props.matchType
   )
-  console.log(questionIDList)
   for (let key of Object.keys(props.roomdata.questionMap)) {
     if (questionIDList.includes(key.toString()) || props.roomdata.questionMap[key].endsWith('[!Disabled]')) {
       continue
@@ -133,7 +132,7 @@ const onRefuse = () => {
     return
   }
   refusedQuestionList.push(parseInt(selectedQuestion.value))
-  thisPhaseRefusedList.push(selectedQuestion.value)
+  // thisPhaseRefusedList.push(selectedQuestion.value)
   props.roomdata.questionMap[selectedQuestion.value] += '[!Disabled]'
   selectedQuestion.value = '-1'
   ElMessage({
@@ -253,13 +252,18 @@ const onSave = () => {
   })
   matchState.value = 'NEXT'
 
-  thisPhaseRefusedList.forEach(question => {
+  // ! 清除所有 disabled
+  for (let question of props.roomdata.questionMap.keys()) {
     props.roomdata.questionMap[question] = props.roomdata.questionMap[question].replaceAll('[!Disabled]', '')
-  })
-  let len = thisPhaseRefusedList.length
-  for (let i = 0; i < len; ++i) {
-    thisPhaseRefusedList.pop()
   }
+
+  // thisPhaseRefusedList.forEach(question => {
+  //   props.roomdata.questionMap[question] = props.roomdata.questionMap[question].replaceAll('[!Disabled]', '')
+  // })
+  // let len = thisPhaseRefusedList.length
+  // for (let i = 0; i < len; ++i) {
+  //   thisPhaseRefusedList.pop()
+  // }
 
   ElMessage({
     showClose: true,
