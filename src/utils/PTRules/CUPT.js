@@ -117,6 +117,11 @@ class CUPTRule extends RuleInterface {
     )
     let oppBanQuestionIDList = oppQRecordList.filter(
       it => {
+        console.log(it)
+        console.log(banRuleList)
+        console.log(banRuleList.some(
+          item => { return item.equals(it[1]) }
+        ))
         return banRuleList.some(
           item => { return item.equals(it[1]) }
         )

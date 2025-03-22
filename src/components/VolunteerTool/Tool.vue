@@ -15,10 +15,6 @@ const props = defineProps({
   round: Number,
   token: String
 })
-let PTRules = {
-  CUPT:   new CUPTRule(),
-  JSYPT:  new JSYPTRule(),
-}
 
 const data = ref({})
 const roomdataRef = ref(null)
@@ -49,6 +45,10 @@ let usedQuestionList = []
 
 
 const nextRound = () => {
+  let PTRules = {
+    CUPT:   new CUPTRule(),
+    JSYPT:  new JSYPTRule(),
+  }
   // ! 加载队名
   let len = roomdataRef.value.teamDataList.length
   if (len === 3) {
@@ -130,7 +130,7 @@ const onRefuse = () => {
   if (props.matchType !== 'NORMAL' || matchState.value !== 'QUESTION') {
     return
   }
-  refusedQuestionList.push(parseInt(selectedQuestion.value))
+  refusedQuestionList.push(selectedQuestion.value)
   roomdataRef.value.questionMap[selectedQuestion.value] += '[!Disabled]'
   selectedQuestion.value = '-1'
   ElMessage({
@@ -144,7 +144,7 @@ const onConfirm = () => {
   if (selectedQuestion.value === '-1' || matchState.value !== 'QUESTION') {
     return
   }
-  usedQuestionList.push(parseInt(selectedQuestion.value))
+  usedQuestionList.push(selectedQuestion.value)
   roomdataRef.value.questionMap[selectedQuestion.value] += '[!Disabled]'
   matchState.value = 'SUBMIT'
   ElMessage({
@@ -155,6 +155,10 @@ const onConfirm = () => {
   })
 }
 const onSave = () => {
+  let PTRules = {
+    CUPT:   new CUPTRule(),
+    JSYPT:  new JSYPTRule(),
+  }
   if (matchState.value !== 'SUBMIT') {
     return
   }
@@ -220,7 +224,7 @@ const onSave = () => {
     'round': props.round,
     'phase': phase.value,
     'roomID': props.roomID,
-    'questionID': parseInt(selectedQuestion.value),
+    'questionID': selectedQuestion.value,
     'masterID': repPlayerID,
     'role': 'R',
     "score": PTRules[props.rule].getScore(repScores),
@@ -232,7 +236,7 @@ const onSave = () => {
     'round': props.round,
     'phase': phase.value,
     'roomID': props.roomID,
-    'questionID': parseInt(selectedQuestion.value),
+    'questionID': selectedQuestion.value,
     'masterID': oppPlayerID,
     'role': 'O',
     'score': PTRules[props.rule].getScore(oppScores),
@@ -242,7 +246,7 @@ const onSave = () => {
     'round': props.round,
     'phase': phase.value,
     'roomID': props.roomID,
-    'questionID': parseInt(selectedQuestion.value),
+    'questionID': selectedQuestion.value,
     'masterID': revPlayerID,
     'role': 'V',
     'score': PTRules[props.rule].getScore(revScores),
@@ -332,7 +336,7 @@ const dialogConfirm = () => {
 }
 
 onMounted(async () => {
-  roomdataRef.value = props.roomdata
+  roomdataRef.value = JSON.parse(JSON.stringify(props.roomdata))
   await proxy.$http.get(`/assist/manage/rooms/data`).then((response) => {
     data.value = response.data
   }).catch((error) => {
@@ -348,6 +352,11 @@ onMounted(async () => {
       element => element.name === roomdataRef.value.teamDataList[i].name
     ).recordDataList
   }
+  for (let i = 0; i < props.roomdata.teamDataList.length; ++i) {
+    props.roomdata.teamDataList[i].recordDataList = data.value.teamDataList.find(
+      element => element.name === props.roomdata.teamDataList[i].name
+    ).recordDataList
+  }
   nextRound()
 })
 </script>
@@ -358,7 +367,7 @@ onMounted(async () => {
       <el-radio-group class="tool-question-list" v-model="selectedQuestion">
         <el-radio
           class="tool-question"
-          v-for="[id, question] in Object.entries(roomdata.questionMap)"
+          v-for="[id, question] in Object.entries(roomdataRef ? roomdataRef.questionMap : {})"
           :key="id"
           :value="id" :disabled="question.endsWith('[!Disabled]') || matchState !== 'QUESTION'"
         >
@@ -375,7 +384,7 @@ onMounted(async () => {
           placement="top"
           effect="dark"
         >
-          <el-input class="showcase-display" :value="(roomdata.questionMap[selectedQuestion] || '').replaceAll('[!Disabled]', '')" placeholder="选题显示在这里！" disabled/>
+          <el-input class="showcase-display" :value="((roomdataRef ? roomdataRef.questionMap[selectedQuestion] : '') || '').replaceAll('[!Disabled]', '')" placeholder="选题显示在这里！" disabled/>
         </el-tooltip>
         <el-button
           class="showcase-button"
@@ -490,7 +499,7 @@ onMounted(async () => {
           @click="onNext"
         >
           {{
-            phase === ((roomdata.teamDataList || [0]).length)
+            phase === ((roomdataRef ? roomdataRef.teamDataList : [0]).length)
               ? '完成本轮比赛！' : '下一场（第 '  + (phase+1) + ' 场）'
           }}
         </el-button>
